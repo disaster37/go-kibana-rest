@@ -13,11 +13,11 @@ const (
 
 // Kibana role management object
 type KibanaRole struct {
-	Name            string                       `json:"name"`
+	Name            string                       `json:"name,omitempty"`
 	Metadata        *KibanaRoleMetadata          `json:"metadata,omitempty"`
 	TransientMedata *KibanaRoleTransientMetadata `json:"transient_metadata,omitempty"`
 	Elasticsearch   *KibanaRoleElasticsearch     `json:"elasticsearch,omitempty"`
-	Kibana          *KibanaRoleKibana            `json:"kibana,omitempty"`
+	Kibana          []KibanaRoleKibana           `json:"kibana,omitempty"`
 }
 type KibanaRoleMetadata struct {
 	Version int `json:"version,omitempty"`
@@ -102,7 +102,7 @@ func newKibanaRoleManagementListFunc(c *resty.Client) KibanaRoleManagementList {
 			return nil, NewAPIError(resp.StatusCode(), resp.Status())
 		}
 		kibanaRoles := make(KibanaRoles, 0, 1)
-		err = json.Unmarshal(resp.Body(), kibanaRoles)
+		err = json.Unmarshal(resp.Body(), &kibanaRoles)
 		if err != nil {
 			return nil, err
 		}
@@ -121,9 +121,12 @@ func newKibanaRoleManagementCreateOrUpdateFunc(c *resty.Client) KibanaRoleManage
 			return nil, NewAPIError(600, "You must provide kibana role object")
 		}
 		log.Debug("Kibana role: ", kibanaRole)
+		roleName := kibanaRole.Name
 
-		path := fmt.Sprintf("%s/%s", basePathKibanaRoleManagement, kibanaRole.Name)
+		path := fmt.Sprintf("%s/%s", basePathKibanaRoleManagement, roleName)
+		kibanaRole.Name = ""
 		jsonData, err := json.Marshal(kibanaRole)
+		log.Debugf("Payload: %s", jsonData)
 		if err != nil {
 			return nil, err
 		}
@@ -135,11 +138,13 @@ func newKibanaRoleManagementCreateOrUpdateFunc(c *resty.Client) KibanaRoleManage
 		if resp.StatusCode() >= 300 {
 			return nil, NewAPIError(resp.StatusCode(), resp.Status())
 		}
-		kibanaRole = &KibanaRole{}
-		err = json.Unmarshal(resp.Body(), kibanaRole)
+
+		// Retrive the object to return it
+		kibanaRole, err = newKibanaRoleManagementGetFunc(c)(roleName)
 		if err != nil {
 			return nil, err
 		}
+
 		log.Debug("KibanaRole: ", kibanaRole)
 
 		return kibanaRole, nil

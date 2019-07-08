@@ -27,7 +27,10 @@ func NewClient(cfg Config) (*Client, error) {
 		cfg.Address = "http://localhost:5602"
 	}
 
-	restyClient := resty.New().SetHostURL(cfg.Address).SetBasicAuth(cfg.Username, cfg.Password)
+	restyClient := resty.New().
+		SetHostURL(cfg.Address).
+		SetBasicAuth(cfg.Username, cfg.Password).
+		SetHeader("kbn-xsrf", "kibana")
 
 	client := &Client{
 		Client: restyClient,

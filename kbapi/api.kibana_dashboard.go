@@ -15,7 +15,7 @@ const (
 type KibanaDashboardExport func(listID []string) (map[string]interface{}, error)
 type KibanaDashboardImport func(data map[string]interface{}, listExcludeType []string, force bool) error
 
-// newKibanaDashboardExport permit to export Kibana dashboard by its names
+// newKibanaDashboardExportFunc permit to export Kibana dashboard by its names
 func newKibanaDashboardExportFunc(c *resty.Client) KibanaDashboardExport {
 	return func(listID []string) (map[string]interface{}, error) {
 
@@ -62,7 +62,7 @@ func newKibanaDashboardImportFunc(c *resty.Client) KibanaDashboardImport {
 		log.Debug("Force import: ", force)
 
 		path := fmt.Sprintf("%s/import", basePathKibanaDashboard)
-		request := c.R().SetQueryString(fmt.Sprintf("force=%s", force))
+		request := c.R().SetQueryString(fmt.Sprintf("force=%t", force))
 		if len(listExcludeType) > 0 {
 			request = request.SetQueryString(fmt.Sprintf("exclude=%s", strings.Join(listExcludeType, ",")))
 		}

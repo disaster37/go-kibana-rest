@@ -83,7 +83,7 @@ func newKibanaSpaceListFunc(c *resty.Client) KibanaSpaceList {
 			return nil, NewAPIError(resp.StatusCode(), resp.Status())
 		}
 		kibanaSpaces := make(KibanaSpaces, 0, 1)
-		err = json.Unmarshal(resp.Body(), kibanaSpaces)
+		err = json.Unmarshal(resp.Body(), &kibanaSpaces)
 		if err != nil {
 			return nil, err
 		}

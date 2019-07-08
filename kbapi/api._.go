@@ -8,6 +8,7 @@ type API struct {
 	KibanaSpaces         *KibanaSpacesAPI
 	KibanaRoleManagement *KibanaRoleManagementAPI
 	KibanaDashboard      *KibanaDashboardAPI
+	KibanaSavedObject    *KibanaSavedObjectAPI
 }
 
 //KibanaSpaces contain the Kibana spaces API
@@ -31,6 +32,13 @@ type KibanaDashboardAPI struct {
 	Import KibanaDashboardImport
 }
 
+type KibanaSavedObjectAPI struct {
+	Get    KibanaSavedObjectGet
+	Create KibanaSavedObjectCreate
+	Update KibanaSavedObjectUpdate
+	Delete KibanaSavedObjectDelete
+}
+
 func New(c *resty.Client) *API {
 	return &API{
 		KibanaSpaces: &KibanaSpacesAPI{
@@ -49,6 +57,12 @@ func New(c *resty.Client) *API {
 		KibanaDashboard: &KibanaDashboardAPI{
 			Export: newKibanaDashboardExportFunc(c),
 			Import: newKibanaDashboardImportFunc(c),
+		},
+		KibanaSavedObject: &KibanaSavedObjectAPI{
+			Get:    newKibanaSavedObjectGetFunc(c),
+			Create: newKibanaSavedObjectCreateFunc(c),
+			Update: newKibanaSavedObjectUpdateFunc(c),
+			Delete: newKibanaSavedObjectDeleteFunc(c),
 		},
 	}
 }
