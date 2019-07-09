@@ -37,6 +37,8 @@ type KibanaSavedObjectAPI struct {
 	Create KibanaSavedObjectCreate
 	Update KibanaSavedObjectUpdate
 	Delete KibanaSavedObjectDelete
+	Import KibanaSavedObjectImport
+	Export KibanaSavedObjectExport
 }
 
 func New(c *resty.Client) *API {
@@ -63,6 +65,8 @@ func New(c *resty.Client) *API {
 			Create: newKibanaSavedObjectCreateFunc(c),
 			Update: newKibanaSavedObjectUpdateFunc(c),
 			Delete: newKibanaSavedObjectDeleteFunc(c),
+			Import: newKibanaSavedObjectImportFunc(c),
+			Export: newKibanaSavedObjectExportFunc(c),
 		},
 	}
 }
