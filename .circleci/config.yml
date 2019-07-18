@@ -14,7 +14,7 @@ jobs:
           ELASTIC_PASSWORD: changeme
           xpack.security.enabled: "true"
       - image: docker.elastic.co/kibana/kibana:7.2.0
-        name: kibana
+        name: kb
         environment:
           ELASTICSEARCH_HOSTS: http://es:9200
           ELASTICSEARCH_USERNAME: elastic
@@ -22,8 +22,8 @@ jobs:
     working_directory: /go/src/github.com/disaster37/go-kibana-rest
     steps:
       - checkout
-      - run: until $(curl --output /dev/null --silent --head --fail -u elastic:changeme http://kibana:5601); do sleep 5; done
-      - run: go test -v ./...
+      - run: until $(curl --output /dev/null --silent --head --fail -u elastic:changeme http://kb:5601); do sleep 5; done
+      - run: go test ./... -parallel=1
   build:
     docker:
       - image: circleci/golang:1.11
