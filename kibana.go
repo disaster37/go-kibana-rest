@@ -3,7 +3,7 @@ package kibana
 import (
 	"crypto/tls"
 	"github.com/disaster37/go-kibana-rest/kbapi"
-	"github.com/go-resty/resty"
+	"github.com/go-resty/resty/v2"
 )
 
 type Config struct {
