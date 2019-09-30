@@ -4,6 +4,9 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
+	"strconv"
+	"strings"
+
 	"github.com/go-resty/resty/v2"
 	log "github.com/sirupsen/logrus"
 )
@@ -12,7 +15,19 @@ const (
 	basePathKibanaSavedObject = "/api/saved_objects" // Base URL to access on Kibana save objects
 )
 
+type OptionalFindParameters struct {
+	ObjectsPerPage        int
+	Page                  int
+	Search                string
+	DefaultSearchOperator string
+	SearchFields          []string
+	Fields                []string
+	SortField             string
+	HasReference          string
+}
+
 type KibanaSavedObjectGet func(objectType string, id string) (map[string]interface{}, error)
+type KibanaSavedObjectFind func(objectType string, optionalParameters *OptionalFindParameters) (map[string]interface{}, error)
 type KibanaSavedObjectCreate func(data map[string]interface{}, objectType string, id string, overwrite bool) (map[string]interface{}, error)
 type KibanaSavedObjectUpdate func(data map[string]interface{}, objectType string, id string) (map[string]interface{}, error)
 type KibanaSavedObjectDelete func(objectType string, id string) error
@@ -34,6 +49,78 @@ func newKibanaSavedObjectGetFunc(c *resty.Client) KibanaSavedObjectGet {
 
 		path := fmt.Sprintf("%s/%s/%s", basePathKibanaSavedObject, objectType, id)
 		resp, err := c.R().Get(path)
+		if err != nil {
+			return nil, err
+		}
+		log.Debug("Response: ", resp)
+		if resp.StatusCode() >= 300 {
+			if resp.StatusCode() == 404 {
+				return nil, nil
+			} else {
+				return nil, NewAPIError(resp.StatusCode(), resp.Status())
+			}
+		}
+		var data map[string]interface{}
+		err = json.Unmarshal(resp.Body(), &data)
+		if err != nil {
+			return nil, err
+		}
+		log.Debug("Data: ", data)
+
+		return data, nil
+	}
+
+}
+
+// newKibanaSavedObjectFindFunc permit to search objects
+func newKibanaSavedObjectFindFunc(c *resty.Client) KibanaSavedObjectFind {
+	return func(objectType string, optionalParameters *OptionalFindParameters) (map[string]interface{}, error) {
+
+		if objectType == "" {
+			return nil, NewAPIError(600, "You must provide the object type")
+		}
+		log.Debug("ObjectType: ", objectType)
+
+		queryParams := map[string]string{
+			"type": objectType,
+		}
+		if optionalParameters != nil {
+			log.Debug("Objects Per Page: ", optionalParameters.ObjectsPerPage)
+			log.Debug("Page: ", optionalParameters.Page)
+			log.Debug("Search: ", optionalParameters.Search)
+			log.Debug("DefaultSearchOperator: ", optionalParameters.DefaultSearchOperator)
+			log.Debug("SearchFields: ", optionalParameters.SearchFields)
+			log.Debug("Fields: ", optionalParameters.Fields)
+			log.Debug("SortField: ", optionalParameters.SortField)
+			log.Debug("HasReference: ", optionalParameters.HasReference)
+			if optionalParameters.ObjectsPerPage != 0 {
+				queryParams["per_page"] = strconv.Itoa(optionalParameters.ObjectsPerPage)
+			}
+			if optionalParameters.Page != 0 {
+				queryParams["page"] = strconv.Itoa(optionalParameters.Page)
+			}
+			if optionalParameters.Search != "" {
+				queryParams["search"] = optionalParameters.Search
+			}
+			if optionalParameters.DefaultSearchOperator != "" {
+				queryParams["default_search_operator"] = optionalParameters.DefaultSearchOperator
+			}
+			if optionalParameters.SearchFields != nil {
+				queryParams["search_fields"] = strings.Join(optionalParameters.SearchFields, ",")
+			}
+			if optionalParameters.Fields != nil {
+				queryParams["fields"] = strings.Join(optionalParameters.Fields, ",")
+			}
+			if optionalParameters.SortField != "" {
+				queryParams["sort_field"] = optionalParameters.SortField
+			}
+			if optionalParameters.HasReference != "" {
+				queryParams["has_reference"] = optionalParameters.HasReference
+			}
+		}
+
+		path := fmt.Sprintf("%s/_find", basePathKibanaSavedObject)
+		resp, err := c.R().SetQueryParams(queryParams).Get(path)
 		if err != nil {
 			return nil, err
 		}

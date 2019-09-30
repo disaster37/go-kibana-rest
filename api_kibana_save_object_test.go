@@ -2,6 +2,8 @@ package kibana
 
 import (
 	"encoding/json"
+
+	"github.com/disaster37/go-kibana-rest/kbapi"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -25,6 +27,18 @@ func (s *KBTestSuite) TestKibanaSaveObject() {
 	assert.NoError(s.T(), err)
 	assert.NotNil(s.T(), resp)
 	assert.Equal(s.T(), "test", resp["id"])
+
+	// Search index pattern
+	parameters := &kbapi.OptionalFindParameters{
+		Search:       "test",
+		SearchFields: []string{"title"},
+		Fields:       []string{"id"},
+	}
+	resp, err = s.client.API.KibanaSavedObject.Find("index-pattern", parameters)
+	assert.NoError(s.T(), err)
+	assert.NotNil(s.T(), resp)
+	dataRes := resp["saved_objects"].([]interface{})[0].(map[string]interface{})
+	assert.Equal(s.T(), "test", dataRes["id"].(string))
 
 	// Update index pattern
 	dataJson = `{"attributes": {"title": "test-pattern2-*"}}`

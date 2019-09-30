@@ -34,6 +34,7 @@ type KibanaDashboardAPI struct {
 
 type KibanaSavedObjectAPI struct {
 	Get    KibanaSavedObjectGet
+	Find   KibanaSavedObjectFind
 	Create KibanaSavedObjectCreate
 	Update KibanaSavedObjectUpdate
 	Delete KibanaSavedObjectDelete
@@ -62,6 +63,7 @@ func New(c *resty.Client) *API {
 		},
 		KibanaSavedObject: &KibanaSavedObjectAPI{
 			Get:    newKibanaSavedObjectGetFunc(c),
+			Find:   newKibanaSavedObjectFindFunc(c),
 			Create: newKibanaSavedObjectCreateFunc(c),
 			Update: newKibanaSavedObjectUpdateFunc(c),
 			Delete: newKibanaSavedObjectDeleteFunc(c),

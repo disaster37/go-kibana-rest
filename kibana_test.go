@@ -1,11 +1,12 @@
 package kibana
 
 import (
+	"testing"
+	"time"
+
 	"github.com/sirupsen/logrus"
 	"github.com/stretchr/testify/suite"
 	prefixed "github.com/x-cray/logrus-prefixed-formatter"
-	"testing"
-	"time"
 )
 
 type KBTestSuite struct {
@@ -21,7 +22,7 @@ func (s *KBTestSuite) SetupSuite() {
 
 	// Init client
 	config := Config{
-		Address:  "http://kb:5601",
+		Address:  "http://golang-12-kb:5601",
 		Username: "elastic",
 		Password: "changeme",
 	}
