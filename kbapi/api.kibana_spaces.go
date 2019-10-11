@@ -3,12 +3,14 @@ package kbapi
 import (
 	"encoding/json"
 	"fmt"
+	"strings"
+
 	"github.com/go-resty/resty/v2"
 	log "github.com/sirupsen/logrus"
 )
 
 const (
-	basePathKibanaSpace = "/api/spaces/space" // Base URL to access on Kibana space API
+	basePathKibanaSpace = "/api/spaces" // Base URL to access on Kibana space API
 )
 
 // Kibana space object
@@ -30,11 +32,24 @@ func (k *KibanaSpace) String() string {
 // List of KibanaSpace objects
 type KibanaSpaces []KibanaSpace
 
+// Parameter to copy saved object on user space
+type KibanaSpaceCopySavedObjectParameter struct {
+	Spaces            []string                     `json:"spaces"`
+	IncludeReferences bool                         `json:"includeReferences"`
+	Overwrite         bool                         `json:"overwrite"`
+	Objects           []KibanaSpaceObjectParameter `json:"objects"`
+}
+type KibanaSpaceObjectParameter struct {
+	Type string `json:"type"`
+	Id   string `json:"id"`
+}
+
 type KibanaSpaceGet func(id string) (*KibanaSpace, error)
 type KibanaSpaceList func() (KibanaSpaces, error)
 type KibanaSpaceCreate func(kibanaSpace *KibanaSpace) (*KibanaSpace, error)
 type KibanaSpaceDelete func(id string) error
 type KibanaSpaceUpdate func(kibanaSpace *KibanaSpace) (*KibanaSpace, error)
+type KibanaSpaceCopySavedObjects func(parameter *KibanaSpaceCopySavedObjectParameter, spaceOrigin string) error
 
 // newKibanaSpaceGetFunc permit to get the kibana space with it id
 func newKibanaSpaceGetFunc(c *resty.Client) KibanaSpaceGet {
@@ -45,7 +60,7 @@ func newKibanaSpaceGetFunc(c *resty.Client) KibanaSpaceGet {
 		}
 		log.Debug("ID: ", id)
 
-		path := fmt.Sprintf("%s/%s", basePathKibanaSpace, id)
+		path := fmt.Sprintf("%s/space/%s", basePathKibanaSpace, id)
 		resp, err := c.R().Get(path)
 		if err != nil {
 			return nil, err
@@ -74,7 +89,8 @@ func newKibanaSpaceGetFunc(c *resty.Client) KibanaSpaceGet {
 func newKibanaSpaceListFunc(c *resty.Client) KibanaSpaceList {
 	return func() (KibanaSpaces, error) {
 
-		resp, err := c.R().Get(basePathKibanaSpace)
+		path := fmt.Sprintf("%s/space", basePathKibanaSpace)
+		resp, err := c.R().Get(path)
 		if err != nil {
 			return nil, err
 		}
@@ -107,7 +123,8 @@ func newKibanaSpaceCreateFunc(c *resty.Client) KibanaSpaceCreate {
 		if err != nil {
 			return nil, err
 		}
-		resp, err := c.R().SetBody(jsonData).Post(basePathKibanaSpace)
+		path := fmt.Sprintf("%s/space", basePathKibanaSpace)
+		resp, err := c.R().SetBody(jsonData).Post(path)
 		if err != nil {
 			return nil, err
 		}
@@ -128,6 +145,57 @@ func newKibanaSpaceCreateFunc(c *resty.Client) KibanaSpaceCreate {
 
 }
 
+// newKibanaSpaceCopySavedObjectsFunc permit to copy extings objects from user space to another userSpace
+func newKibanaSpaceCopySavedObjectsFunc(c *resty.Client) KibanaSpaceCopySavedObjects {
+	return func(parameter *KibanaSpaceCopySavedObjectParameter, spaceOrigin string) error {
+
+		if parameter == nil {
+			return NewAPIError(600, "You must provide parameter to copy existing objects on other user spaces")
+		}
+		log.Debug("Parameter: ", parameter)
+		log.Debug("SpaceOrigin: ", spaceOrigin)
+
+		var path string
+		if spaceOrigin == "" {
+			path = fmt.Sprintf("%s/_copy_saved_objects", basePathKibanaSpace)
+		} else {
+			path = fmt.Sprintf("/s/%s%s/_copy_saved_objects", spaceOrigin, basePathKibanaSpace)
+		}
+		jsonData, err := json.Marshal(parameter)
+		if err != nil {
+			return err
+		}
+		resp, err := c.R().SetBody(jsonData).Post(path)
+		if err != nil {
+			return err
+		}
+
+		log.Debug("Response: ", resp)
+		if resp.StatusCode() >= 300 {
+			return NewAPIError(resp.StatusCode(), resp.Status())
+		}
+		data := make(map[string]interface{})
+		err = json.Unmarshal(resp.Body(), &data)
+		if err != nil {
+			return err
+		}
+		log.Debug("Response: ", data)
+
+		var errors []string
+		for name, object := range data {
+			if object.(map[string]interface{})["success"].(bool) == false {
+				errors = append(errors, fmt.Sprintf("Error to process user space %s", name))
+			}
+		}
+		if len(errors) > 0 {
+			return NewAPIError(500, strings.Join(errors, "\n"))
+		}
+
+		return nil
+	}
+
+}
+
 // newKibanaSpaceDeleteFunc permit to delete the kubana space wiht it id
 func newKibanaSpaceDeleteFunc(c *resty.Client) KibanaSpaceDelete {
 	return func(id string) error {
@@ -138,7 +206,7 @@ func newKibanaSpaceDeleteFunc(c *resty.Client) KibanaSpaceDelete {
 
 		log.Debug("ID: ", id)
 
-		path := fmt.Sprintf("%s/%s", basePathKibanaSpace, id)
+		path := fmt.Sprintf("%s/space/%s", basePathKibanaSpace, id)
 		resp, err := c.R().Delete(path)
 		if err != nil {
 			return err
@@ -168,7 +236,7 @@ func newKibanaSpaceUpdateFunc(c *resty.Client) KibanaSpaceUpdate {
 		if err != nil {
 			return nil, err
 		}
-		path := fmt.Sprintf("%s/%s", basePathKibanaSpace, kibanaSpace.ID)
+		path := fmt.Sprintf("%s/space/%s", basePathKibanaSpace, kibanaSpace.ID)
 		resp, err := c.R().SetBody(jsonData).Put(path)
 		if err != nil {
 			return nil, err
