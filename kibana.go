@@ -2,6 +2,7 @@ package kibana
 
 import (
 	"crypto/tls"
+
 	"github.com/disaster37/go-kibana-rest/kbapi"
 	"github.com/go-resty/resty/v2"
 )
@@ -11,6 +12,7 @@ type Config struct {
 	Username         string
 	Password         string
 	DisableVerifySSL bool
+	CAs              []string
 }
 
 type Client struct {
@@ -24,13 +26,17 @@ func NewDefaultClient() (*Client, error) {
 
 func NewClient(cfg Config) (*Client, error) {
 	if cfg.Address == "" {
-		cfg.Address = "http://localhost:5602"
+		cfg.Address = "http://localhost:5601"
 	}
 
 	restyClient := resty.New().
 		SetHostURL(cfg.Address).
 		SetBasicAuth(cfg.Username, cfg.Password).
 		SetHeader("kbn-xsrf", "true")
+
+	for _, path := range cfg.CAs {
+		restyClient.SetRootCertificate(path)
+	}
 
 	client := &Client{
 		Client: restyClient,
