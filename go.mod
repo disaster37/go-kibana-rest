@@ -4,7 +4,6 @@ go 1.12
 
 require (
 	github.com/go-resty/resty/v2 v2.0.0
-	github.com/disaster37/go-kibana-rest
 	github.com/golang/protobuf v1.3.2 // indirect
 	github.com/konsorten/go-windows-terminal-sequences v1.0.2 // indirect
 	github.com/mattn/go-colorable v0.1.2 // indirect
