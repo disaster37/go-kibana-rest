@@ -3,6 +3,7 @@ package kbapi
 import (
 	"encoding/json"
 	"fmt"
+
 	"github.com/go-resty/resty/v2"
 	log "github.com/sirupsen/logrus"
 )
@@ -14,14 +15,12 @@ const (
 // Kibana role management object
 type KibanaRole struct {
 	Name            string                       `json:"name,omitempty"`
-	Metadata        *KibanaRoleMetadata          `json:"metadata,omitempty"`
+	Metadata        map[string]interface{}       `json:"metadata,omitempty"`
 	TransientMedata *KibanaRoleTransientMetadata `json:"transient_metadata,omitempty"`
 	Elasticsearch   *KibanaRoleElasticsearch     `json:"elasticsearch,omitempty"`
 	Kibana          []KibanaRoleKibana           `json:"kibana,omitempty"`
 }
-type KibanaRoleMetadata struct {
-	Version int `json:"version,omitempty"`
-}
+
 type KibanaRoleTransientMetadata struct {
 	Enabled bool `json:"enabled,omitempty"`
 }
@@ -39,7 +38,7 @@ type KibanaRoleElasticsearchIndice struct {
 	Names         []string            `json:"names,omitempty"`
 	Privileges    []string            `json:"privileges,omitempty"`
 	FieldSecurity map[string][]string `json:"field_security,omitempty"`
-	Query         string              `json:"query,omitempty"`
+	Query         interface{}         `json:"query,omitempty"`
 }
 
 func (k *KibanaRole) String() string {
