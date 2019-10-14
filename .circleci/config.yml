@@ -6,14 +6,14 @@ jobs:
   test:
     docker:
       - image: circleci/golang:1.11
-      - image: docker.elastic.co/elasticsearch/elasticsearch:7.2.0
+      - image: docker.elastic.co/elasticsearch/elasticsearch:7.4.0
         name: es
         environment:
           cluster.name: test
           discovery.type: single-node
           ELASTIC_PASSWORD: changeme
           xpack.security.enabled: "true"
-      - image: docker.elastic.co/kibana/kibana:7.2.0
+      - image: docker.elastic.co/kibana/kibana:7.4.0
         name: kb
         environment:
           ELASTICSEARCH_HOSTS: http://es:9200
