@@ -35,10 +35,10 @@ type KibanaRoleKibana struct {
 	Spaces  []string            `json:"spaces,omitempty"`
 }
 type KibanaRoleElasticsearchIndice struct {
-	Names         []string            `json:"names,omitempty"`
-	Privileges    []string            `json:"privileges,omitempty"`
-	FieldSecurity map[string][]string `json:"field_security,omitempty"`
-	Query         interface{}         `json:"query,omitempty"`
+	Names         []string               `json:"names,omitempty"`
+	Privileges    []string               `json:"privileges,omitempty"`
+	FieldSecurity map[string]interface{} `json:"field_security,omitempty"`
+	Query         interface{}            `json:"query,omitempty"`
 }
 
 func (k *KibanaRole) String() string {
