@@ -24,8 +24,15 @@ jobs:
     working_directory: /go/src/github.com/disaster37/go-kibana-rest
     steps:
       - checkout
+      - restore_cache:
+          keys:
+            - v1-pkg-cache
       - run: until $(curl --output /dev/null --silent --head --fail -u elastic:changeme http://kb:5601); do sleep 5; done
       - run: go test ./... -v
+      - save_cache:
+          key: v1-pkg-cache
+          paths:
+            - "/go/pkg"
   build:
     docker:
       - image: circleci/golang:1.12
@@ -34,6 +41,9 @@ jobs:
     working_directory: /go/src/github.com/disaster37/go-kibana-rest
     steps:
       - checkout
+      - restore_cache:
+          keys:
+            - v1-pkg-cache
       - run: go build
 workflows:
   version: 2
