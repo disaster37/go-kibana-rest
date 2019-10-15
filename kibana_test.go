@@ -4,6 +4,7 @@ import (
 	"testing"
 	"time"
 
+	"github.com/disaster37/go-kibana-rest/kbapi"
 	"github.com/sirupsen/logrus"
 	"github.com/stretchr/testify/suite"
 	prefixed "github.com/x-cray/logrus-prefixed-formatter"
@@ -40,6 +41,18 @@ func (s *KBTestSuite) SetupSuite() {
 			isOnline = true
 		} else {
 			time.Sleep(5 * time.Second)
+		}
+	}
+
+	// Create kibana space
+	space := &kbapi.KibanaSpace{
+		ID:   "testacc",
+		Name: "testacc",
+	}
+	_, err = client.API.KibanaSpaces.Create(space)
+	if err != nil {
+		if err.(kbapi.APIError).Code != 409 {
+			panic(err)
 		}
 	}
 

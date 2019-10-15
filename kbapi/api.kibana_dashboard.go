@@ -12,19 +12,28 @@ const (
 	basePathKibanaDashboard = "/api/kibana/dashboards" // Base URL to access on Kibana dashboard
 )
 
-type KibanaDashboardExport func(listID []string) (map[string]interface{}, error)
-type KibanaDashboardImport func(data map[string]interface{}, listExcludeType []string, force bool) error
+type KibanaDashboardExport func(listID []string, kibanaSpace string) (map[string]interface{}, error)
+type KibanaDashboardImport func(data map[string]interface{}, listExcludeType []string, force bool, kibanaSpace string) error
 
 // newKibanaDashboardExportFunc permit to export Kibana dashboard by its names
 func newKibanaDashboardExportFunc(c *resty.Client) KibanaDashboardExport {
-	return func(listID []string) (map[string]interface{}, error) {
+	return func(listID []string, kibanaSpace string) (map[string]interface{}, error) {
 
 		if len(listID) == 0 {
 			return nil, NewAPIError(600, "You must provide on or more dashboard ID")
 		}
 		log.Debug("listID: ", listID)
+		log.Debug("kibanaSpace: ", kibanaSpace)
 
-		path := fmt.Sprintf("%s/export", basePathKibanaDashboard)
+		var path string
+		if kibanaSpace == "" || kibanaSpace == "default" {
+			path = fmt.Sprintf("%s/export", basePathKibanaDashboard)
+		} else {
+			path = fmt.Sprintf("/s/%s%s/export", kibanaSpace, basePathKibanaDashboard)
+		}
+
+		log.Debugf("Url to export: %s", path)
+
 		query := fmt.Sprintf("dashboard=%s", strings.Join(listID, ","))
 		resp, err := c.R().SetQueryString(query).Get(path)
 		if err != nil {
@@ -52,7 +61,7 @@ func newKibanaDashboardExportFunc(c *resty.Client) KibanaDashboardExport {
 
 // newKibanaDashboardImportFunc permit to import kibana dashboard
 func newKibanaDashboardImportFunc(c *resty.Client) KibanaDashboardImport {
-	return func(data map[string]interface{}, listExcludeType []string, force bool) error {
+	return func(data map[string]interface{}, listExcludeType []string, force bool, kibanaSpace string) error {
 
 		if data == nil {
 			return NewAPIError(600, "You must provide one or more dashboard to import")
@@ -60,8 +69,17 @@ func newKibanaDashboardImportFunc(c *resty.Client) KibanaDashboardImport {
 		log.Debug("data: ", data)
 		log.Debug("List type to exclude: ", listExcludeType)
 		log.Debug("Force import: ", force)
+		log.Debug("KibanaSpace: ", kibanaSpace)
 
-		path := fmt.Sprintf("%s/import", basePathKibanaDashboard)
+		var path string
+		if kibanaSpace == "" || kibanaSpace == "default" {
+			path = fmt.Sprintf("%s/import", basePathKibanaDashboard)
+		} else {
+			path = fmt.Sprintf("/s/%s%s/import", kibanaSpace, basePathKibanaDashboard)
+		}
+
+		log.Debugf("URL to import %s", path)
+
 		request := c.R().SetQueryString(fmt.Sprintf("force=%t", force))
 		if len(listExcludeType) > 0 {
 			request = request.SetQueryString(fmt.Sprintf("exclude=%s", strings.Join(listExcludeType, ",")))
