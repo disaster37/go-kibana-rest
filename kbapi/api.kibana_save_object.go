@@ -26,17 +26,17 @@ type OptionalFindParameters struct {
 	HasReference          string
 }
 
-type KibanaSavedObjectGet func(objectType string, id string) (map[string]interface{}, error)
-type KibanaSavedObjectFind func(objectType string, optionalParameters *OptionalFindParameters) (map[string]interface{}, error)
-type KibanaSavedObjectCreate func(data map[string]interface{}, objectType string, id string, overwrite bool) (map[string]interface{}, error)
-type KibanaSavedObjectUpdate func(data map[string]interface{}, objectType string, id string) (map[string]interface{}, error)
-type KibanaSavedObjectDelete func(objectType string, id string) error
-type KibanaSavedObjectExport func(objectTypes []string, objects []map[string]string, deepReference bool) (map[string]interface{}, error)
-type KibanaSavedObjectImport func(data []byte, overwrite bool) (map[string]interface{}, error)
+type KibanaSavedObjectGet func(objectType string, id string, kibanaSpace string) (map[string]interface{}, error)
+type KibanaSavedObjectFind func(objectType string, kibanaSpace string, optionalParameters *OptionalFindParameters) (map[string]interface{}, error)
+type KibanaSavedObjectCreate func(data map[string]interface{}, objectType string, id string, overwrite bool, kibanaSpace string) (map[string]interface{}, error)
+type KibanaSavedObjectUpdate func(data map[string]interface{}, objectType string, id string, kibanaSpace string) (map[string]interface{}, error)
+type KibanaSavedObjectDelete func(objectType string, id string, kibanaSpace string) error
+type KibanaSavedObjectExport func(objectTypes []string, objects []map[string]string, deepReference bool, kibanaSpace string) (map[string]interface{}, error)
+type KibanaSavedObjectImport func(data []byte, overwrite bool, kibanaSpace string) (map[string]interface{}, error)
 
 // newKibanaSavedObjectGetFunc permit to get saved obejct by it id and type
 func newKibanaSavedObjectGetFunc(c *resty.Client) KibanaSavedObjectGet {
-	return func(objectType string, id string) (map[string]interface{}, error) {
+	return func(objectType string, id string, kibanaSpace string) (map[string]interface{}, error) {
 
 		if objectType == "" {
 			return nil, NewAPIError(600, "You must provide the object type")
@@ -46,8 +46,17 @@ func newKibanaSavedObjectGetFunc(c *resty.Client) KibanaSavedObjectGet {
 		}
 		log.Debug("ObjectType: ", objectType)
 		log.Debug("ID: ", id)
+		log.Debug("KibanaSpace: ", kibanaSpace)
 
-		path := fmt.Sprintf("%s/%s/%s", basePathKibanaSavedObject, objectType, id)
+		var path string
+		if kibanaSpace == "" || kibanaSpace == "default" {
+			path = fmt.Sprintf("%s/%s/%s", basePathKibanaSavedObject, objectType, id)
+		} else {
+			path = fmt.Sprintf("/s/%s%s/%s/%s", kibanaSpace, basePathKibanaSavedObject, objectType, id)
+		}
+		log.Debugf("URL to get object: %s", path)
+
+
 		resp, err := c.R().Get(path)
 		if err != nil {
 			return nil, err
@@ -74,12 +83,13 @@ func newKibanaSavedObjectGetFunc(c *resty.Client) KibanaSavedObjectGet {
 
 // newKibanaSavedObjectFindFunc permit to search objects
 func newKibanaSavedObjectFindFunc(c *resty.Client) KibanaSavedObjectFind {
-	return func(objectType string, optionalParameters *OptionalFindParameters) (map[string]interface{}, error) {
+	return func(objectType string, kibanaSpace string, optionalParameters *OptionalFindParameters) (map[string]interface{}, error) {
 
 		if objectType == "" {
 			return nil, NewAPIError(600, "You must provide the object type")
 		}
 		log.Debug("ObjectType: ", objectType)
+		log.Debug("KibanaSpace : ", kibanaSpace)
 
 		queryParams := map[string]string{
 			"type": objectType,
@@ -119,7 +129,14 @@ func newKibanaSavedObjectFindFunc(c *resty.Client) KibanaSavedObjectFind {
 			}
 		}
 
-		path := fmt.Sprintf("%s/_find", basePathKibanaSavedObject)
+		var path string
+		if kibanaSpace == "" || kibanaSpace == "default" {
+			path = fmt.Sprintf("%s/_find", basePathKibanaSavedObject)
+		} else {
+			path = fmt.Sprintf("/s/%s%s/_find", kibanaSpace, basePathKibanaSavedObject)
+		}
+		log.Debugf("URL to find object: %s", path)
+
 		resp, err := c.R().SetQueryParams(queryParams).Get(path)
 		if err != nil {
 			return nil, err
@@ -146,7 +163,7 @@ func newKibanaSavedObjectFindFunc(c *resty.Client) KibanaSavedObjectFind {
 
 // newKibanaSavedObjectCreateFunc permit to create new object on Kibana
 func newKibanaSavedObjectCreateFunc(c *resty.Client) KibanaSavedObjectCreate {
-	return func(data map[string]interface{}, objectType string, id string, overwrite bool) (map[string]interface{}, error) {
+	return func(data map[string]interface{}, objectType string, id string, overwrite bool, kibanaSpace string) (map[string]interface{}, error) {
 
 		if data == nil {
 			return nil, NewAPIError(600, "You must provide one or more dashboard to import")
@@ -158,8 +175,16 @@ func newKibanaSavedObjectCreateFunc(c *resty.Client) KibanaSavedObjectCreate {
 		log.Debug("ObjectType: ", objectType)
 		log.Debug("ID: ", id)
 		log.Debug("Overwrite: ", overwrite)
+		log.Debug("KibanaSpace: ", kibanaSpace)
 
-		path := fmt.Sprintf("%s/%s/%s", basePathKibanaSavedObject, objectType, id)
+		var path string
+		if kibanaSpace == "" || kibanaSpace == "default" {
+			path = fmt.Sprintf("%s/%s/%s", basePathKibanaSavedObject, objectType, id)
+		} else {
+			path = fmt.Sprintf("/s/%s%s/%s/%s", kibanaSpace, basePathKibanaSavedObject, objectType, id)
+		}
+		log.Debugf("URL to create object: %s", path)
+
 		jsonData, err := json.Marshal(data)
 		if err != nil {
 			return nil, err
@@ -185,7 +210,7 @@ func newKibanaSavedObjectCreateFunc(c *resty.Client) KibanaSavedObjectCreate {
 
 // newKibanaSavedObjectUpdateFunc permit to update object on Kibana
 func newKibanaSavedObjectUpdateFunc(c *resty.Client) KibanaSavedObjectUpdate {
-	return func(data map[string]interface{}, objectType string, id string) (map[string]interface{}, error) {
+	return func(data map[string]interface{}, objectType string, id string, kibanaSpace string) (map[string]interface{}, error) {
 
 		if data == nil {
 			return nil, NewAPIError(600, "You must provide one or more dashboard to import")
@@ -199,8 +224,16 @@ func newKibanaSavedObjectUpdateFunc(c *resty.Client) KibanaSavedObjectUpdate {
 		log.Debug("data: ", data)
 		log.Debug("ObjectType: ", objectType)
 		log.Debug("ID: ", id)
+		log.Debug("kibanaSpace: ", kibanaSpace)
 
-		path := fmt.Sprintf("%s/%s/%s", basePathKibanaSavedObject, objectType, id)
+		var path string
+		if kibanaSpace == "" || kibanaSpace == "default" {
+			path = fmt.Sprintf("%s/%s/%s", basePathKibanaSavedObject, objectType, id)
+		} else {
+			path = fmt.Sprintf("/s/%s%s/%s/%s", kibanaSpace, basePathKibanaSavedObject, objectType, id)
+		}
+		log.Debugf("URL to update object: %s", path)
+
 		jsonData, err := json.Marshal(data)
 		if err != nil {
 			return nil, err
@@ -226,7 +259,7 @@ func newKibanaSavedObjectUpdateFunc(c *resty.Client) KibanaSavedObjectUpdate {
 
 // newKibanaSavedObjectDeleteFunc permit to delete object on Kibana
 func newKibanaSavedObjectDeleteFunc(c *resty.Client) KibanaSavedObjectDelete {
-	return func(objectType string, id string) error {
+	return func(objectType string, id string, kibanaSpace string) error {
 
 		if objectType == "" {
 			return NewAPIError(600, "You must provide the object type")
@@ -236,8 +269,16 @@ func newKibanaSavedObjectDeleteFunc(c *resty.Client) KibanaSavedObjectDelete {
 		}
 		log.Debug("objectType: ", objectType)
 		log.Debug("ID: ", id)
+		log.Debug("KibanaSpace: ", kibanaSpace)
 
-		path := fmt.Sprintf("%s/%s/%s", basePathKibanaSavedObject, objectType, id)
+		var path string
+		if kibanaSpace == "" || kibanaSpace == "default" {
+			path = fmt.Sprintf("%s/%s/%s", basePathKibanaSavedObject, objectType, id)
+		} else {
+			path = fmt.Sprintf("/s/%s%s/%s/%s", kibanaSpace, basePathKibanaSavedObject, objectType, id)
+		}
+		log.Debugf("URL to delete object: %s", path)
+
 		resp, err := c.R().Delete(path)
 		if err != nil {
 			return err
@@ -259,11 +300,12 @@ func newKibanaSavedObjectDeleteFunc(c *resty.Client) KibanaSavedObjectDelete {
 
 // newKibanaSavedObjectExportFunc permit to export Kibana object
 func newKibanaSavedObjectExportFunc(c *resty.Client) KibanaSavedObjectExport {
-	return func(objectTypes []string, objects []map[string]string, deepReference bool) (map[string]interface{}, error) {
+	return func(objectTypes []string, objects []map[string]string, deepReference bool, kibanaSpace string) (map[string]interface{}, error) {
 
 		log.Debug("ObjectTypes: ", objectTypes)
 		log.Debug("Objects: ", objects)
 		log.Debug("DeepReference: ", deepReference)
+		log.Debug("KibanaSpace: ", kibanaSpace)
 
 		payload := make(map[string]interface{})
 
@@ -276,7 +318,14 @@ func newKibanaSavedObjectExportFunc(c *resty.Client) KibanaSavedObjectExport {
 		payload["includeReferencesDeep"] = deepReference
 		log.Debug("Payload: ", payload)
 
-		path := fmt.Sprintf("%s/_export", basePathKibanaSavedObject)
+		var path string
+		if kibanaSpace == "" || kibanaSpace == "default" {
+			path = fmt.Sprintf("%s/_export", basePathKibanaSavedObject)
+		} else {
+			path = fmt.Sprintf("/s/%s%s/_export", kibanaSpace, basePathKibanaSavedObject)
+		}
+		log.Debugf("URL to export object: %s", path)
+
 		jsonData, err := json.Marshal(payload)
 		if err != nil {
 			return nil, err
@@ -303,7 +352,7 @@ func newKibanaSavedObjectExportFunc(c *resty.Client) KibanaSavedObjectExport {
 
 // newKibanaSavedObjectImportFunc permit to import Kibana object
 func newKibanaSavedObjectImportFunc(c *resty.Client) KibanaSavedObjectImport {
-	return func(data []byte, overwrite bool) (map[string]interface{}, error) {
+	return func(data []byte, overwrite bool, kibanaSpace string) (map[string]interface{}, error) {
 
 		if len(data) == 0 {
 			return nil, NewAPIError(600, "You must provide data parameters")
@@ -311,8 +360,16 @@ func newKibanaSavedObjectImportFunc(c *resty.Client) KibanaSavedObjectImport {
 
 		log.Debug("Data: ", data)
 		log.Debug("Overwrite: ", overwrite)
+		log.Debug("kibanaSpace: ", kibanaSpace)
 
-		path := fmt.Sprintf("%s/_import", basePathKibanaSavedObject)
+		var path string
+		if kibanaSpace == "" || kibanaSpace == "default" {
+			path = fmt.Sprintf("%s/_import", basePathKibanaSavedObject)
+		} else {
+			path = fmt.Sprintf("/s/%s%s/_import", kibanaSpace, basePathKibanaSavedObject)
+		}
+		log.Debugf("URL to export object: %s", path)
+
 		resp, err := c.R().
 			SetQueryString(fmt.Sprintf("overwrite=%t", overwrite)).
 			SetFileReader("file", "file.ndjson", bytes.NewReader(data)).
