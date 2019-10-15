@@ -1,6 +1,7 @@
 package kibana
 
 import (
+	"fmt"
 	"os"
 	"testing"
 	"time"
@@ -52,7 +53,7 @@ func (s *KBTestSuite) SetupSuite() {
 		} else {
 			time.Sleep(5 * time.Second)
 			if nbTry == 10 {
-				panic(fmt.Sprintf("We wait 50s that Kibana start: %s", err)
+				panic(fmt.Sprintf("We wait 50s that Kibana start: %s", err))
 			}
 			nbTry++
 		}
