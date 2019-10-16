@@ -1,7 +1,7 @@
 version: '2.3'
 services:
   elasticsearch:
-    image: docker.elastic.co/elasticsearch/elasticsearch:7.2.0
+    image: docker.elastic.co/elasticsearch/elasticsearch:7.4.0
     environment:
       cluster.name: test
       discovery.type: single-node
@@ -17,7 +17,7 @@ services:
       - elasticsearch:es
     ports:
       - "5601:5601/tcp"
-  
+
   test:
     image: golang:1.12
     working_dir: /go/src/github.com/disaster37/go-kibana-rest
@@ -37,7 +37,7 @@ services:
     volumes:
       - .:/go/src/github.com/disaster37/go-kibana-rest
     command: "bash -c \"go get github.com/mitchellh/gox && gox -osarch='linux/amd64' -output 'release/kibana-rest_{{.OS}}_{{.Arch}}'\""
-  
+
 
   curl:
     image: appropriate/curl:latest

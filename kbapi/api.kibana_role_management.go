@@ -12,7 +12,7 @@ const (
 	basePathKibanaRoleManagement = "/api/security/role" // Base URL to access on Kibana role management
 )
 
-// Kibana role management object
+// KibanaRole is the API role object
 type KibanaRole struct {
 	Name            string                       `json:"name,omitempty"`
 	Metadata        map[string]interface{}       `json:"metadata,omitempty"`
@@ -21,19 +21,26 @@ type KibanaRole struct {
 	Kibana          []KibanaRoleKibana           `json:"kibana,omitempty"`
 }
 
+// KibanaRoleTransientMetadata is the API TransientMedata object
 type KibanaRoleTransientMetadata struct {
 	Enabled bool `json:"enabled,omitempty"`
 }
+
+// KibanaRoleElasticsearch is the API Elasticsearch object
 type KibanaRoleElasticsearch struct {
 	Indices []KibanaRoleElasticsearchIndice `json:"indices,omitempty"`
 	Cluster []string                        `json:"cluster,omitempty"`
 	RunAs   []string                        `json:"run_as,omitempty"`
 }
+
+// KibanaRoleKibana is the API Kibana object
 type KibanaRoleKibana struct {
 	Base    []string            `json:"base,omitempty"`
 	Feature map[string][]string `json:"feature,omitempty"`
 	Spaces  []string            `json:"spaces,omitempty"`
 }
+
+// KibanaRoleElasticsearchIndice is the API indice object
 type KibanaRoleElasticsearchIndice struct {
 	Names         []string               `json:"names,omitempty"`
 	Privileges    []string               `json:"privileges,omitempty"`
@@ -41,18 +48,27 @@ type KibanaRoleElasticsearchIndice struct {
 	Query         interface{}            `json:"query,omitempty"`
 }
 
+
+// KibanaRoles is a list of role object
+type KibanaRoles []KibanaRole
+
+// KibanaRoleManagementGet permit to get role from Kibana
+type KibanaRoleManagementGet func(name string) (*KibanaRole, error)
+
+// KibanaRoleManagementList permit to get all roles from Kibana
+type KibanaRoleManagementList func() (KibanaRoles, error)
+
+// KibanaRoleManagementCreateOrUpdate permit to create or update role in Kibana
+type KibanaRoleManagementCreateOrUpdate func(kibanaRole *KibanaRole) (*KibanaRole, error)
+
+// KibanaRoleManagementDelete permit to delete role in Kibana
+type KibanaRoleManagementDelete func(name string) error
+
+// String permit to return KibanaRole object as JSON string
 func (k *KibanaRole) String() string {
 	json, _ := json.Marshal(k)
 	return string(json)
 }
-
-// List of KibanaRole objects
-type KibanaRoles []KibanaRole
-
-type KibanaRoleManagementGet func(name string) (*KibanaRole, error)
-type KibanaRoleManagementList func() (KibanaRoles, error)
-type KibanaRoleManagementCreateOrUpdate func(kibanaRole *KibanaRole) (*KibanaRole, error)
-type KibanaRoleManagementDelete func(name string) error
 
 // newKibanaRoleManagementGetFunc permit to get the kibana role with it name
 func newKibanaRoleManagementGetFunc(c *resty.Client) KibanaRoleManagementGet {
@@ -72,9 +88,8 @@ func newKibanaRoleManagementGetFunc(c *resty.Client) KibanaRoleManagementGet {
 		if resp.StatusCode() >= 300 {
 			if resp.StatusCode() == 404 {
 				return nil, nil
-			} else {
-				return nil, NewAPIError(resp.StatusCode(), resp.Status())
 			}
+			return nil, NewAPIError(resp.StatusCode(), resp.Status())
 		}
 		kibanaRole := &KibanaRole{}
 		err = json.Unmarshal(resp.Body(), kibanaRole)

@@ -15,6 +15,7 @@ const (
 	basePathKibanaSavedObject = "/api/saved_objects" // Base URL to access on Kibana save objects
 )
 
+// OptionalFindParameters contain optional parameters to find objects
 type OptionalFindParameters struct {
 	ObjectsPerPage        int
 	Page                  int
@@ -26,12 +27,25 @@ type OptionalFindParameters struct {
 	HasReference          string
 }
 
+// KibanaSavedObjectGet permit to get saved object from Kibana
 type KibanaSavedObjectGet func(objectType string, id string, kibanaSpace string) (map[string]interface{}, error)
+
+// KibanaSavedObjectFind permit to find saved objects from Kibana
 type KibanaSavedObjectFind func(objectType string, kibanaSpace string, optionalParameters *OptionalFindParameters) (map[string]interface{}, error)
+
+// KibanaSavedObjectCreate permit to create saved object in Kibana
 type KibanaSavedObjectCreate func(data map[string]interface{}, objectType string, id string, overwrite bool, kibanaSpace string) (map[string]interface{}, error)
+
+// KibanaSavedObjectUpdate permit to update saved object in Kibana
 type KibanaSavedObjectUpdate func(data map[string]interface{}, objectType string, id string, kibanaSpace string) (map[string]interface{}, error)
+
+// KibanaSavedObjectDelete permit to delete saved object in Kibana
 type KibanaSavedObjectDelete func(objectType string, id string, kibanaSpace string) error
+
+// KibanaSavedObjectExport permit to export saved objects from Kibana
 type KibanaSavedObjectExport func(objectTypes []string, objects []map[string]string, deepReference bool, kibanaSpace string) (map[string]interface{}, error)
+
+// KibanaSavedObjectImport permit to import saved objects in Kibana
 type KibanaSavedObjectImport func(data []byte, overwrite bool, kibanaSpace string) (map[string]interface{}, error)
 
 // newKibanaSavedObjectGetFunc permit to get saved obejct by it id and type
@@ -65,9 +79,9 @@ func newKibanaSavedObjectGetFunc(c *resty.Client) KibanaSavedObjectGet {
 		if resp.StatusCode() >= 300 {
 			if resp.StatusCode() == 404 {
 				return nil, nil
-			} else {
-				return nil, NewAPIError(resp.StatusCode(), resp.Status())
 			}
+			return nil, NewAPIError(resp.StatusCode(), resp.Status())
+
 		}
 		var data map[string]interface{}
 		err = json.Unmarshal(resp.Body(), &data)
@@ -145,9 +159,9 @@ func newKibanaSavedObjectFindFunc(c *resty.Client) KibanaSavedObjectFind {
 		if resp.StatusCode() >= 300 {
 			if resp.StatusCode() == 404 {
 				return nil, nil
-			} else {
-				return nil, NewAPIError(resp.StatusCode(), resp.Status())
 			}
+			return nil, NewAPIError(resp.StatusCode(), resp.Status())
+
 		}
 		var data map[string]interface{}
 		err = json.Unmarshal(resp.Body(), &data)

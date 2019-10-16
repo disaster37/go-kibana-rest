@@ -13,7 +13,7 @@ const (
 	basePathKibanaSpace = "/api/spaces" // Base URL to access on Kibana space API
 )
 
-// Kibana space object
+// KibanaSpace is the Space API object
 type KibanaSpace struct {
 	ID               string   `json:"id"`
 	Name             string   `json:"name"`
@@ -24,32 +24,46 @@ type KibanaSpace struct {
 	Color            string   `json:"color,omitempty"`
 }
 
-func (k *KibanaSpace) String() string {
-	json, _ := json.Marshal(k)
-	return string(json)
-}
-
-// List of KibanaSpace objects
+// KibanaSpaces is the list of KibanaSpace object
 type KibanaSpaces []KibanaSpace
 
-// Parameter to copy saved object on user space
+// KibanaSpaceCopySavedObjectParameter is parameters to copy dashboard between spaces
 type KibanaSpaceCopySavedObjectParameter struct {
 	Spaces            []string                     `json:"spaces"`
 	IncludeReferences bool                         `json:"includeReferences"`
 	Overwrite         bool                         `json:"overwrite"`
 	Objects           []KibanaSpaceObjectParameter `json:"objects"`
 }
+
+// KibanaSpaceObjectParameter is Object object
 type KibanaSpaceObjectParameter struct {
 	Type string `json:"type"`
-	Id   string `json:"id"`
+	ID   string `json:"id"`
 }
 
+// KibanaSpaceGet permit to get space
 type KibanaSpaceGet func(id string) (*KibanaSpace, error)
+
+// KibanaSpaceList permit to get all spaces
 type KibanaSpaceList func() (KibanaSpaces, error)
+
+// KibanaSpaceCreate permit to create space
 type KibanaSpaceCreate func(kibanaSpace *KibanaSpace) (*KibanaSpace, error)
+
+// KibanaSpaceDelete permit to delete space
 type KibanaSpaceDelete func(id string) error
+
+// KibanaSpaceUpdate permit to update space
 type KibanaSpaceUpdate func(kibanaSpace *KibanaSpace) (*KibanaSpace, error)
+
+// KibanaSpaceCopySavedObjects permit to copy dashboad between space
 type KibanaSpaceCopySavedObjects func(parameter *KibanaSpaceCopySavedObjectParameter, spaceOrigin string) error
+
+// String permit to return KibanaSpace object as JSON string
+func (k *KibanaSpace) String() string {
+	json, _ := json.Marshal(k)
+	return string(json)
+}
 
 // newKibanaSpaceGetFunc permit to get the kibana space with it id
 func newKibanaSpaceGetFunc(c *resty.Client) KibanaSpaceGet {
@@ -69,9 +83,9 @@ func newKibanaSpaceGetFunc(c *resty.Client) KibanaSpaceGet {
 		if resp.StatusCode() >= 300 {
 			if resp.StatusCode() == 404 {
 				return nil, nil
-			} else {
-				return nil, NewAPIError(resp.StatusCode(), resp.Status())
 			}
+			return nil, NewAPIError(resp.StatusCode(), resp.Status())
+
 		}
 		kibanaSpace := &KibanaSpace{}
 		err = json.Unmarshal(resp.Body(), kibanaSpace)

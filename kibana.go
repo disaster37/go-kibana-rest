@@ -7,6 +7,7 @@ import (
 	"github.com/go-resty/resty/v2"
 )
 
+// Config contain the value to access on Kibana API
 type Config struct {
 	Address          string
 	Username         string
@@ -15,15 +16,18 @@ type Config struct {
 	CAs              []string
 }
 
+// Client contain the REST client and the API specification
 type Client struct {
 	*kbapi.API
 	Client *resty.Client
 }
 
+// NewDefaultClient init client with empty config
 func NewDefaultClient() (*Client, error) {
 	return NewClient(Config{})
 }
 
+// NewClient init client with custom config
 func NewClient(cfg Config) (*Client, error) {
 	if cfg.Address == "" {
 		cfg.Address = "http://localhost:5601"

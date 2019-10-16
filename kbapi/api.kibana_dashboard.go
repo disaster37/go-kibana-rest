@@ -12,7 +12,10 @@ const (
 	basePathKibanaDashboard = "/api/kibana/dashboards" // Base URL to access on Kibana dashboard
 )
 
+// KibanaDashboardExport permit to export dashboard
 type KibanaDashboardExport func(listID []string, kibanaSpace string) (map[string]interface{}, error)
+
+// KibanaDashboardImport permit to import dashboard
 type KibanaDashboardImport func(data map[string]interface{}, listExcludeType []string, force bool, kibanaSpace string) error
 
 // newKibanaDashboardExportFunc permit to export Kibana dashboard by its names
@@ -43,9 +46,9 @@ func newKibanaDashboardExportFunc(c *resty.Client) KibanaDashboardExport {
 		if resp.StatusCode() >= 300 {
 			if resp.StatusCode() == 404 {
 				return nil, nil
-			} else {
-				return nil, NewAPIError(resp.StatusCode(), resp.Status())
 			}
+			return nil, NewAPIError(resp.StatusCode(), resp.Status())
+
 		}
 		var data map[string]interface{}
 		err = json.Unmarshal(resp.Body(), &data)

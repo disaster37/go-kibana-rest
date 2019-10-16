@@ -10,9 +10,9 @@ import (
 func (s *KBTestSuite) TestKibanaSaveObject() {
 
 	// Create new index pattern
-	dataJson := `{"attributes": {"title": "test-pattern-*"}}`
+	dataJSON := `{"attributes": {"title": "test-pattern-*"}}`
 	data := make(map[string]interface{})
-	err := json.Unmarshal([]byte(dataJson), &data)
+	err := json.Unmarshal([]byte(dataJSON), &data)
 	if err != nil {
 		panic(err)
 	}
@@ -23,9 +23,9 @@ func (s *KBTestSuite) TestKibanaSaveObject() {
 	assert.Equal(s.T(), "test-pattern-*", resp["attributes"].(map[string]interface{})["title"])
 
 	// Create new index pattern in space
-	dataJson = `{"attributes": {"title": "test-pattern-*"}}`
+	dataJSON = `{"attributes": {"title": "test-pattern-*"}}`
 	data = make(map[string]interface{})
-	err = json.Unmarshal([]byte(dataJson), &data)
+	err = json.Unmarshal([]byte(dataJSON), &data)
 	if err != nil {
 		panic(err)
 	}
@@ -72,8 +72,8 @@ func (s *KBTestSuite) TestKibanaSaveObject() {
 	assert.Equal(s.T(), "test", dataRes["id"].(string))
 
 	// Update index pattern
-	dataJson = `{"attributes": {"title": "test-pattern2-*"}}`
-	err = json.Unmarshal([]byte(dataJson), &data)
+	dataJSON = `{"attributes": {"title": "test-pattern2-*"}}`
+	err = json.Unmarshal([]byte(dataJSON), &data)
 	if err != nil {
 		panic(err)
 	}
@@ -84,8 +84,8 @@ func (s *KBTestSuite) TestKibanaSaveObject() {
 	assert.Equal(s.T(), "test-pattern2-*", resp["attributes"].(map[string]interface{})["title"])
 
 	// Update index pattern in space
-	dataJson = `{"attributes": {"title": "test-pattern2-*"}}`
-	err = json.Unmarshal([]byte(dataJson), &data)
+	dataJSON = `{"attributes": {"title": "test-pattern2-*"}}`
+	err = json.Unmarshal([]byte(dataJSON), &data)
 	if err != nil {
 		panic(err)
 	}

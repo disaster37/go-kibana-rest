@@ -4,6 +4,7 @@ import (
 	"github.com/go-resty/resty/v2"
 )
 
+// API handle the API specification
 type API struct {
 	KibanaSpaces         *KibanaSpacesAPI
 	KibanaRoleManagement *KibanaRoleManagementAPI
@@ -12,7 +13,7 @@ type API struct {
 	KibanaStatus         *KibanaStatusAPI
 }
 
-//KibanaSpaces contain the Kibana spaces API
+// KibanaSpacesAPI handle the spaces API
 type KibanaSpacesAPI struct {
 	Get              KibanaSpaceGet
 	List             KibanaSpaceList
@@ -22,6 +23,7 @@ type KibanaSpacesAPI struct {
 	CopySavedObjects KibanaSpaceCopySavedObjects
 }
 
+// KibanaRoleManagementAPI handle the role management API
 type KibanaRoleManagementAPI struct {
 	Get            KibanaRoleManagementGet
 	List           KibanaRoleManagementList
@@ -29,11 +31,13 @@ type KibanaRoleManagementAPI struct {
 	Delete         KibanaRoleManagementDelete
 }
 
+// KibanaDashboardAPI handle the dashboard API
 type KibanaDashboardAPI struct {
 	Export KibanaDashboardExport
 	Import KibanaDashboardImport
 }
 
+// KibanaSavedObjectAPI handle the saved object API
 type KibanaSavedObjectAPI struct {
 	Get    KibanaSavedObjectGet
 	Find   KibanaSavedObjectFind
@@ -44,10 +48,12 @@ type KibanaSavedObjectAPI struct {
 	Export KibanaSavedObjectExport
 }
 
+// KibanaStatusAPI handle the status API
 type KibanaStatusAPI struct {
 	Get KibanaStatusGet
 }
 
+// New initialise the API implementation
 func New(c *resty.Client) *API {
 	return &API{
 		KibanaSpaces: &KibanaSpacesAPI{
