@@ -31,14 +31,17 @@ jobs:
       - checkout
       - run: go get gotest.tools/gotestsum
       - run: until $(curl --output /dev/null --silent --head --fail -u elastic:changeme http://kb:5601); do sleep 5; done
-      - run: gotestsum \
-            --format=short-verbose \
-            --junitfile=junit.xml -- \
-            --race \
-            --timeout=1h \
-            --cover --coverprofile=unit-coverage.out -v \
-            --tags='unit' \
-            ./...
+      - run:
+        name: Run Unit Tests
+        command: |
+          gotestsum \
+          --format=short-verbose \
+          --junitfile=junit.xml -- \
+          --race \
+          --timeout=1h \
+          --cover --coverprofile=unit-coverage.out -v \
+          --tags='unit' \
+          ./...
       - codecov/upload:
           file: unit-coverage.out
           flags: unittest
