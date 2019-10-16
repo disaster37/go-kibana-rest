@@ -34,6 +34,21 @@ func (s *KBTestSuite) TestKibanaSpaces() {
 	assert.NoError(s.T(), err)
 	assert.Equal(s.T(), "test2", kibanaSpace.Name)
 
+	// Copy object on space
+	parameter := &kbapi.KibanaSpaceCopySavedObjectParameter{
+		Spaces:            []string{"test"},
+		IncludeReferences: true,
+		Overwrite:         true,
+		Objects: []kbapi.KibanaSpaceObjectParameter{
+			kbapi.KibanaSpaceObjectParameter{
+				Type: "config",
+				ID:   "7.4.0",
+			},
+		},
+	}
+	err = s.client.KibanaSpaces.CopySavedObjects(parameter, "")
+	assert.NoError(s.T(), err)
+
 	// Delete space
 	err = s.client.KibanaSpaces.Delete(kibanaSpace.ID)
 	assert.NoError(s.T(), err)

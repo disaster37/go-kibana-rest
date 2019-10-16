@@ -1,19 +1,26 @@
 # Golang CircleCI 2.0 configuration file
 #
 # Check https://circleci.com/docs/2.0/language-go/ for more details
-version: 2
+version: 2.1
+orbs:
+  codecov: codecov/codecov@1.0.5
 jobs:
   test:
     docker:
-      - image: circleci/golang:1.11
-      - image: docker.elastic.co/elasticsearch/elasticsearch:7.2.0
+      - image: circleci/golang:1.12
+        environment:
+          - GO111MODULE: "on"
+          - KIBANA_URL: "http://kb:5601"
+          - KIBANA_USERNAME: "elastic"
+          - KIBANA_PASSWORD: "changeme"
+      - image: docker.elastic.co/elasticsearch/elasticsearch:7.4.0
         name: es
         environment:
           cluster.name: test
           discovery.type: single-node
           ELASTIC_PASSWORD: changeme
           xpack.security.enabled: "true"
-      - image: docker.elastic.co/kibana/kibana:7.2.0
+      - image: docker.elastic.co/kibana/kibana:7.4.0
         name: kb
         environment:
           ELASTICSEARCH_HOSTS: http://es:9200
@@ -22,11 +29,25 @@ jobs:
     working_directory: /go/src/github.com/disaster37/go-kibana-rest
     steps:
       - checkout
+      - run: go get gotest.tools/gotestsum
       - run: until $(curl --output /dev/null --silent --head --fail -u elastic:changeme http://kb:5601); do sleep 5; done
-      - run: go test ./... -parallel=1
+      - run: |
+          gotestsum \
+          --format=short-verbose \
+          --junitfile=junit.xml -- \
+          --race \
+          --timeout=1h \
+          --cover --coverprofile=unit-coverage.out -v \
+          --tags='unit' \
+          ./...
+      - codecov/upload:
+          file: unit-coverage.out
+          flags: unittest
   build:
     docker:
-      - image: circleci/golang:1.11
+      - image: circleci/golang:1.12
+        environment:
+          - GO111MODULE: "on"
     working_directory: /go/src/github.com/disaster37/go-kibana-rest
     steps:
       - checkout
