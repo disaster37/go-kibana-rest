@@ -70,7 +70,6 @@ func newKibanaSavedObjectGetFunc(c *resty.Client) KibanaSavedObjectGet {
 		}
 		log.Debugf("URL to get object: %s", path)
 
-
 		resp, err := c.R().Get(path)
 		if err != nil {
 			return nil, err

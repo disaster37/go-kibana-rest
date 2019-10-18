@@ -48,7 +48,6 @@ type KibanaRoleElasticsearchIndice struct {
 	Query         interface{}            `json:"query,omitempty"`
 }
 
-
 // KibanaRoles is a list of role object
 type KibanaRoles []KibanaRole
 
