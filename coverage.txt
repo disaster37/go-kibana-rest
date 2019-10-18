@@ -17,8 +17,8 @@ github.com/disaster37/go-kibana-rest/kbapi/api.kibana_status.go:28.31,29.32 1 0
 github.com/disaster37/go-kibana-rest/kbapi/api.kibana_status.go:32.4,32.61 1 0
 github.com/disaster37/go-kibana-rest/kbapi/api.kibana_status.go:29.32,31.5 1 0
 github.com/disaster37/go-kibana-rest/kbapi/api.kibana_status.go:36.17,38.4 1 0
-github.com/disaster37/go-kibana-rest/kbapi/error.go:14.34,16.2 1 0
-github.com/disaster37/go-kibana-rest/kbapi/error.go:19.76,24.2 1 1
+github.com/disaster37/go-kibana-rest/kbapi/error.go:14.34,16.2 1 1
+github.com/disaster37/go-kibana-rest/kbapi/error.go:19.76,24.2 1 2
 github.com/disaster37/go-kibana-rest/kbapi/api._.go:57.32,90.2 1 1
 github.com/disaster37/go-kibana-rest/kbapi/api.kibana_dashboard.go:22.74,23.83 1 1
 github.com/disaster37/go-kibana-rest/kbapi/api.kibana_dashboard.go:23.83,25.23 1 2

@@ -29,7 +29,6 @@ jobs:
     working_directory: /go/src/github.com/disaster37/go-kibana-rest
     steps:
       - checkout
-      - run: go get gotest.tools/gotestsum
       - run: until $(curl --output /dev/null --silent --head --fail -u elastic:changeme http://kb:5601); do sleep 5; done
       - run: make test
       - codecov/upload:
