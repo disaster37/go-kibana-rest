@@ -15,12 +15,19 @@ At the moment is only work with Kibana 7.x.
 
 In your go.mod, put:
 ```go
-require github.com/disaster37/go-kibana-rest
+require github.com/disaster37/go-kibana-rest/v7
 ```
 
 ## Usage
 
-@todo
+### Init the client
+
+```go
+
+
+
+
+```
 
 ## Contribute
 

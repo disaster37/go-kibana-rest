@@ -1,4 +1,4 @@
-module github.com/disaster37/go-kibana-rest
+module github.com/disaster37/go-kibana-rest/v7
 
 go 1.12
 
