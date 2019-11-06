@@ -36,7 +36,8 @@ func NewClient(cfg Config) (*Client, error) {
 	restyClient := resty.New().
 		SetHostURL(cfg.Address).
 		SetBasicAuth(cfg.Username, cfg.Password).
-		SetHeader("kbn-xsrf", "true")
+		SetHeader("kbn-xsrf", "true").
+		SetHeader("Content-Type", "application/json")
 
 	for _, path := range cfg.CAs {
 		restyClient.SetRootCertificate(path)

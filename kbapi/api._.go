@@ -12,6 +12,7 @@ type API struct {
 	KibanaSavedObject      *KibanaSavedObjectAPI
 	KibanaStatus           *KibanaStatusAPI
 	KibanaLogstashPipeline *KibanaLogstashPipelineAPI
+	KibanaShortenURL       *KibanaShortenURLAPI
 }
 
 // KibanaSpacesAPI handle the spaces API
@@ -62,6 +63,11 @@ type KibanaLogstashPipelineAPI struct {
 	Delete         KibanaLogstashPipelineDelete
 }
 
+// KibanaShortenURLAPI handle the shorten URL API
+type KibanaShortenURLAPI struct {
+	Create KibanaShortenURLCreate
+}
+
 // New initialise the API implementation
 func New(c *resty.Client) *API {
 	return &API{
@@ -100,6 +106,9 @@ func New(c *resty.Client) *API {
 			List:           newKibanaLogstashPipelineListFunc(c),
 			CreateOrUpdate: newKibanaLogstashPipelineCreateOrUpdateFunc(c),
 			Delete:         newKibanaLogstashPipelineDeleteFunc(c),
+		},
+		KibanaShortenURL: &KibanaShortenURLAPI{
+			Create: newKibanaShortenURLCreateFunc(c),
 		},
 	}
 }

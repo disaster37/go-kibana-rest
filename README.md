@@ -21,3 +21,13 @@ require github.com/disaster37/go-kibana-rest
 ## Usage
 
 @todo
+
+## Contribute
+
+First, if you use kibana module that required license like Logstash Pipeline, you need to have valid license or start trial license.
+
+Start trial license:
+```bash
+curl -XPOST -u elastic:changeme "http://localhost:9200/_license/start_trial?acknowledge=true&pretty"
+
+```
