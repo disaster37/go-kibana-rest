@@ -3,7 +3,7 @@ package kibana
 import (
 	"crypto/tls"
 
-	"github.com/disaster37/go-kibana-rest/kbapi"
+	"github.com/disaster37/go-kibana-rest/v7/kbapi"
 	"github.com/go-resty/resty/v2"
 )
 

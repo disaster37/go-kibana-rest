@@ -23,9 +23,29 @@ require github.com/disaster37/go-kibana-rest/v7
 ### Init the client
 
 ```go
+cfg := kibana.Config{
+    Address:          "http://127.0.0.1:5601",
+    Username:         "elastic",
+    Password:         "changeme",
+    DisableVerifySSL: true,
+}
 
+client, err := kibana.NewClient(cfg)
 
+if err != nil {
+    log.Fatalf("Error creating the client: %s", err)
+}
 
+status, err := client.API.KibanaStatus.Get()
+if err != nil {
+    log.Fatalf("Error getting response: %s", err)
+}
+log.Println(status)
+```
+
+### Handle shorten URL
+
+```go
 
 ```
 
