@@ -14,4 +14,7 @@ fmt:
 	@echo "==> Fixing source code with gofmt..."
 	gofmt -s -w ./
 
+trial-license:
+	curl -XPOST -u ${ELASTICSEARCH_USERNAME}:${ELASTICSEARCH_PASSWORD} ${ELASTICSEARCH_URLS}/_license/start_trial?acknowledge=true
+
 
