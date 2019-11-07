@@ -1,4 +1,4 @@
-package kibana
+package kbapi
 
 import (
 	"encoding/json"
@@ -7,35 +7,35 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func (s *KBTestSuite) TestKibanaDashboard() {
+func (s *KBAPITestSuite) TestKibanaDashboard() {
 
 	// Import dashboard from fixtures
-	b, err := ioutil.ReadFile("fixtures/kibana-dashboard.json")
+	b, err := ioutil.ReadFile("../fixtures/kibana-dashboard.json")
 	if err != nil {
 		panic(err)
 	}
 	data := make(map[string]interface{})
 	err = json.Unmarshal(b, &data)
-	err = s.client.API.KibanaDashboard.Import(data, nil, true, "default")
+	err = s.API.KibanaDashboard.Import(data, nil, true, "default")
 	assert.NoError(s.T(), err)
 
 	// Export dashboard
-	data, err = s.client.API.KibanaDashboard.Export([]string{"edf84fe0-e1a0-11e7-b6d5-4dc382ef7f5b"}, "default")
+	data, err = s.API.KibanaDashboard.Export([]string{"edf84fe0-e1a0-11e7-b6d5-4dc382ef7f5b"}, "default")
 	assert.NoError(s.T(), err)
 	assert.NotNil(s.T(), data)
 
 	// Import dashboard from fixtures in specific space
-	b, err = ioutil.ReadFile("fixtures/kibana-dashboard.json")
+	b, err = ioutil.ReadFile("../fixtures/kibana-dashboard.json")
 	if err != nil {
 		panic(err)
 	}
 	data = make(map[string]interface{})
 	err = json.Unmarshal(b, &data)
-	err = s.client.API.KibanaDashboard.Import(data, nil, true, "testacc")
+	err = s.API.KibanaDashboard.Import(data, nil, true, "testacc")
 	assert.NoError(s.T(), err)
 
 	// Export dashboard from specific space
-	data, err = s.client.API.KibanaDashboard.Export([]string{"edf84fe0-e1a0-11e7-b6d5-4dc382ef7f5b"}, "testacc")
+	data, err = s.API.KibanaDashboard.Export([]string{"edf84fe0-e1a0-11e7-b6d5-4dc382ef7f5b"}, "testacc")
 	assert.NoError(s.T(), err)
 	assert.NotNil(s.T(), data)
 

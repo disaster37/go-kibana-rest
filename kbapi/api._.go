@@ -6,11 +6,13 @@ import (
 
 // API handle the API specification
 type API struct {
-	KibanaSpaces         *KibanaSpacesAPI
-	KibanaRoleManagement *KibanaRoleManagementAPI
-	KibanaDashboard      *KibanaDashboardAPI
-	KibanaSavedObject    *KibanaSavedObjectAPI
-	KibanaStatus         *KibanaStatusAPI
+	KibanaSpaces           *KibanaSpacesAPI
+	KibanaRoleManagement   *KibanaRoleManagementAPI
+	KibanaDashboard        *KibanaDashboardAPI
+	KibanaSavedObject      *KibanaSavedObjectAPI
+	KibanaStatus           *KibanaStatusAPI
+	KibanaLogstashPipeline *KibanaLogstashPipelineAPI
+	KibanaShortenURL       *KibanaShortenURLAPI
 }
 
 // KibanaSpacesAPI handle the spaces API
@@ -53,6 +55,19 @@ type KibanaStatusAPI struct {
 	Get KibanaStatusGet
 }
 
+// KibanaLogstashPipelineAPI handle the logstash configuration management API
+type KibanaLogstashPipelineAPI struct {
+	Get            KibanaLogstashPipelineGet
+	List           KibanaLogstashPipelineList
+	CreateOrUpdate KibanaLogstashPipelineCreateOrUpdate
+	Delete         KibanaLogstashPipelineDelete
+}
+
+// KibanaShortenURLAPI handle the shorten URL API
+type KibanaShortenURLAPI struct {
+	Create KibanaShortenURLCreate
+}
+
 // New initialise the API implementation
 func New(c *resty.Client) *API {
 	return &API{
@@ -85,6 +100,15 @@ func New(c *resty.Client) *API {
 		},
 		KibanaStatus: &KibanaStatusAPI{
 			Get: newKibanaStatusGetFunc(c),
+		},
+		KibanaLogstashPipeline: &KibanaLogstashPipelineAPI{
+			Get:            newKibanaLogstashPipelineGetFunc(c),
+			List:           newKibanaLogstashPipelineListFunc(c),
+			CreateOrUpdate: newKibanaLogstashPipelineCreateOrUpdateFunc(c),
+			Delete:         newKibanaLogstashPipelineDeleteFunc(c),
+		},
+		KibanaShortenURL: &KibanaShortenURLAPI{
+			Create: newKibanaShortenURLCreateFunc(c),
 		},
 	}
 }

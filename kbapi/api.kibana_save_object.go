@@ -48,6 +48,12 @@ type KibanaSavedObjectExport func(objectTypes []string, objects []map[string]str
 // KibanaSavedObjectImport permit to import saved objects in Kibana
 type KibanaSavedObjectImport func(data []byte, overwrite bool, kibanaSpace string) (map[string]interface{}, error)
 
+// String permit to return OptionalFindParameters object as JSON string
+func (o *OptionalFindParameters) String() string {
+	json, _ := json.Marshal(o)
+	return string(json)
+}
+
 // newKibanaSavedObjectGetFunc permit to get saved obejct by it id and type
 func newKibanaSavedObjectGetFunc(c *resty.Client) KibanaSavedObjectGet {
 	return func(objectType string, id string, kibanaSpace string) (map[string]interface{}, error) {
@@ -69,7 +75,6 @@ func newKibanaSavedObjectGetFunc(c *resty.Client) KibanaSavedObjectGet {
 			path = fmt.Sprintf("/s/%s%s/%s/%s", kibanaSpace, basePathKibanaSavedObject, objectType, id)
 		}
 		log.Debugf("URL to get object: %s", path)
-
 
 		resp, err := c.R().Get(path)
 		if err != nil {
