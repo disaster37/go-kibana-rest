@@ -46,33 +46,29 @@ func (s *KBAPITestSuite) TestKibanaSaveObject() {
 	assert.NotNil(s.T(), resp)
 	assert.Equal(s.T(), "test", resp["id"])
 
-	/*
-		Not working in 7.4.0. It's a bug
-		// Search index pattern
-		parameters := &OptionalFindParameters{
-			Search:       "test",
-			SearchFields: []string{"id"},
-			Fields:       []string{"id"},
-		}
-		resp, err = s.API.KibanaSavedObject.Find("index-pattern", "default", parameters)
-		panic(fmt.Sprintf("%+v", resp))
-		assert.NoError(s.T(), err)
-		assert.NotNil(s.T(), resp)
-		dataRes := resp["saved_objects"].([]interface{})[0].(map[string]interface{})
-		assert.Equal(s.T(), "test", dataRes["id"].(string))
+	// Search index pattern
+	parameters := &OptionalFindParameters{
+		Search:       "test*",
+		SearchFields: []string{"title"},
+		Fields:       []string{"id"},
+	}
+	resp, err = s.API.KibanaSavedObject.Find("index-pattern", "default", parameters)
+	assert.NoError(s.T(), err)
+	assert.NotNil(s.T(), resp)
+	dataRes := resp["saved_objects"].([]interface{})[0].(map[string]interface{})
+	assert.Equal(s.T(), "test", dataRes["id"].(string))
 
-		// Search index pattern from space
-		parameters = &OptionalFindParameters{
-			Search:       "test-pattern-*",
-			SearchFields: []string{"title"},
-			Fields:       []string{"id"},
-		}
-		resp, err = s.API.KibanaSavedObject.Find("index-pattern", "testacc", parameters)
-		assert.NoError(s.T(), err)
-		assert.NotNil(s.T(), resp)
-		dataRes = resp["saved_objects"].([]interface{})[0].(map[string]interface{})
-		assert.Equal(s.T(), "test", dataRes["id"].(string))
-	*/
+	// Search index pattern from space
+	parameters = &OptionalFindParameters{
+		Search:       "test*",
+		SearchFields: []string{"title"},
+		Fields:       []string{"id"},
+	}
+	resp, err = s.API.KibanaSavedObject.Find("index-pattern", "testacc", parameters)
+	assert.NoError(s.T(), err)
+	assert.NotNil(s.T(), resp)
+	dataRes = resp["saved_objects"].([]interface{})[0].(map[string]interface{})
+	assert.Equal(s.T(), "test", dataRes["id"].(string))
 
 	// Update index pattern
 	dataJSON = `{"attributes": {"title": "test-pattern2-*"}}`

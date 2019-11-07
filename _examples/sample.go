@@ -154,7 +154,7 @@ func main() {
 	if err != nil {
 		log.Fatalf("Error exporting dashboard: %s", err)
 	}
-	log.Println("Exporting dashboard successfully: %s", data)
+	log.Println(data)
 
 	// Create or update role
 	role := &kbapi.KibanaRole{
