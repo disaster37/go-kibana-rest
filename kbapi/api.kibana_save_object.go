@@ -43,7 +43,7 @@ type KibanaSavedObjectUpdate func(data map[string]interface{}, objectType string
 type KibanaSavedObjectDelete func(objectType string, id string, kibanaSpace string) error
 
 // KibanaSavedObjectExport permit to export saved objects from Kibana
-type KibanaSavedObjectExport func(objectTypes []string, objects []map[string]string, deepReference bool, kibanaSpace string) (map[string]interface{}, error)
+type KibanaSavedObjectExport func(objectTypes []string, objects []map[string]string, deepReference bool, kibanaSpace string) ([]byte, error)
 
 // KibanaSavedObjectImport permit to import saved objects in Kibana
 type KibanaSavedObjectImport func(data []byte, overwrite bool, kibanaSpace string) (map[string]interface{}, error)
@@ -319,7 +319,7 @@ func newKibanaSavedObjectDeleteFunc(c *resty.Client) KibanaSavedObjectDelete {
 
 // newKibanaSavedObjectExportFunc permit to export Kibana object
 func newKibanaSavedObjectExportFunc(c *resty.Client) KibanaSavedObjectExport {
-	return func(objectTypes []string, objects []map[string]string, deepReference bool, kibanaSpace string) (map[string]interface{}, error) {
+	return func(objectTypes []string, objects []map[string]string, deepReference bool, kibanaSpace string) ([]byte, error) {
 
 		log.Debug("ObjectTypes: ", objectTypes)
 		log.Debug("Objects: ", objects)
@@ -357,14 +357,11 @@ func newKibanaSavedObjectExportFunc(c *resty.Client) KibanaSavedObjectExport {
 		if resp.StatusCode() >= 300 {
 			return nil, NewAPIError(resp.StatusCode(), resp.Status())
 		}
-		var dataResponse map[string]interface{}
-		err = json.Unmarshal(resp.Body(), &dataResponse)
-		if err != nil {
-			return nil, err
-		}
-		log.Debug("Data response: ", dataResponse)
 
-		return dataResponse, nil
+		data := resp.Body()
+		log.Debug("Data response: ", data)
+
+		return data, nil
 
 	}
 }
