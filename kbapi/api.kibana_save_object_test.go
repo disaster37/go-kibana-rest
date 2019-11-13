@@ -101,9 +101,9 @@ func (s *KBAPITestSuite) TestKibanaSaveObject() {
 			"id":   "test",
 		},
 	}
-	resp, err = s.API.KibanaSavedObject.Export(nil, request, true, "default")
+	dataExported, err := s.API.KibanaSavedObject.Export(nil, request, true, "default")
 	assert.NoError(s.T(), err)
-	assert.NotNil(s.T(), resp)
+	assert.NotEmpty(s.T(), dataExported)
 
 	// Export index pattern from space
 	request = []map[string]string{
@@ -112,9 +112,9 @@ func (s *KBAPITestSuite) TestKibanaSaveObject() {
 			"id":   "test",
 		},
 	}
-	resp, err = s.API.KibanaSavedObject.Export(nil, request, true, "testacc")
+	dataExported, err = s.API.KibanaSavedObject.Export(nil, request, true, "testacc")
 	assert.NoError(s.T(), err)
-	assert.NotNil(s.T(), resp)
+	assert.NotEmpty(s.T(), dataExported)
 
 	// import index pattern
 	b, err := json.Marshal(resp)
