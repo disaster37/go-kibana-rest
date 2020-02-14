@@ -170,7 +170,7 @@ func newKibanaSpaceCopySavedObjectsFunc(c *resty.Client) KibanaSpaceCopySavedObj
 		log.Debug("SpaceOrigin: ", spaceOrigin)
 
 		var path string
-		if spaceOrigin == "" {
+		if spaceOrigin == "" || spaceOrigin == "default" {
 			path = fmt.Sprintf("%s/_copy_saved_objects", basePathKibanaSpace)
 		} else {
 			path = fmt.Sprintf("/s/%s%s/_copy_saved_objects", spaceOrigin, basePathKibanaSpace)
