@@ -21,6 +21,13 @@ type LogstashPipeline struct {
 	Username    string                 `json:"username,omitempty"`
 }
 
+type LogstashPipelineRequest struct {
+	Description string                 `json:"description,omitempty"`
+	Pipeline    string                 `json:"pipeline,omitempty"`
+	Settings    map[string]interface{} `json:"settings,omitempty"`
+	Username    string                 `json:"username,omitempty"`
+}
+
 // LogstashPipelinesList is the logstash pipeline list result when get the list
 type LogstashPipelinesList struct {
 	Pipelines LogstashPipelines `json:"pipelines"`
@@ -114,7 +121,13 @@ func newKibanaLogstashPipelineCreateOrUpdateFunc(c *resty.Client) KibanaLogstash
 
 		log.Debug("LogstashPipeline: ", logstashPipeline)
 
-		jsonData, err := json.Marshal(logstashPipeline)
+		logstashPipelineRequest := &LogstashPipelineRequest{
+			Description: logstashPipeline.Description,
+			Pipeline:    logstashPipeline.Pipeline,
+			Settings:    logstashPipeline.Settings,
+		}
+
+		jsonData, err := json.Marshal(logstashPipelineRequest)
 		if err != nil {
 			return nil, err
 		}

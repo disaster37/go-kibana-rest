@@ -256,14 +256,14 @@ func main() {
 			"id":   "test",
 		},
 	}
-	resp, err = client.API.KibanaSavedObject.Export(nil, request, true, "default")
-	if err != nil {
-		log.Fatalf("Error exporting index pattern: %s", err)
+	response, error := client.API.KibanaSavedObject.Export(nil, request, true, "default")
+	if error != nil {
+		log.Fatalf("Error exporting index pattern: %s", error)
 	}
-	log.Println(resp)
+	log.Println(response)
 
 	// import index pattern in default user space
-	b, err = json.Marshal(resp)
+	b, err = json.Marshal(response)
 	if err != nil {
 		log.Fatalf("Error converting struct to json")
 	}
