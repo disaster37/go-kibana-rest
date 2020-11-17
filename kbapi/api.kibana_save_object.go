@@ -327,6 +327,7 @@ func newKibanaSavedObjectExportFunc(c *resty.Client) KibanaSavedObjectExport {
 		log.Debug("KibanaSpace: ", kibanaSpace)
 
 		payload := make(map[string]interface{})
+		payload["excludeExportDetails"] = true
 
 		if len(objectTypes) > 0 {
 			payload["type"] = objectTypes
