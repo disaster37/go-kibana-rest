@@ -32,6 +32,7 @@ type KibanaSpaceCopySavedObjectParameter struct {
 	Spaces            []string                     `json:"spaces"`
 	IncludeReferences bool                         `json:"includeReferences"`
 	Overwrite         bool                         `json:"overwrite"`
+	CreateNewCopies   bool 						   `json:"createNewCopies`
 	Objects           []KibanaSpaceObjectParameter `json:"objects"`
 }
 
