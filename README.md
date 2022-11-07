@@ -9,13 +9,13 @@ Go framework to handle kibana API
 
 ## Compatibility
 
-At the moment is only work with Kibana 7.x.
+It work with Kibana 7.x. and 8.x
 
 ## Installation
 
 In your go.mod, put:
 ```go
-require github.com/disaster37/go-kibana-rest/v7
+require github.com/disaster37/go-kibana-rest/v8
 ```
 
 ## Usage

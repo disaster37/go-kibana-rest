@@ -6,8 +6,8 @@ import (
 	"io/ioutil"
 	"log"
 
-	"github.com/disaster37/go-kibana-rest/v7"
-	"github.com/disaster37/go-kibana-rest/v7/kbapi"
+	"github.com/disaster37/go-kibana-rest/v8"
+	"github.com/disaster37/go-kibana-rest/v8/kbapi"
 )
 
 func main() {

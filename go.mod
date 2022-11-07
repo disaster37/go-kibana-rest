@@ -1,4 +1,4 @@
-module github.com/disaster37/go-kibana-rest/v7
+module github.com/disaster37/go-kibana-rest/v8
 
 go 1.19
 
