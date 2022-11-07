@@ -33,7 +33,7 @@ jobs:
           until curl -s -X POST -u elastic:changeme -H "Content-Type: application/json" http://localhost:9200/_security/user/kibana_system/_password -d "{\"password\":\"changeme\"}" | grep -q "^{}"; do sleep 10; done
           curl -XPOST -u elastic:changeme http://localhost:9200/_license/start_trial?acknowledge=true
           docker-compose up kibana &
-          until $(curl --output /dev/null --silent --head --fail -u elastic:changeme http://kb:5601); do sleep 5; done
+          until $(curl --output /dev/null --silent --head --fail -u elastic:changeme http://localhost:5601); do sleep 5; done
           sleep 10
       - name: golangci-lint
         uses: golangci/golangci-lint-action@v3
