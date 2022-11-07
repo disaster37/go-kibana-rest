@@ -11,7 +11,6 @@ import (
 
 type KBTestSuite struct {
 	suite.Suite
-	client *Client
 }
 
 func (s *KBTestSuite) SetupSuite() {

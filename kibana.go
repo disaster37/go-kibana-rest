@@ -3,7 +3,7 @@ package kibana
 import (
 	"crypto/tls"
 
-	"github.com/disaster37/go-kibana-rest/v7/kbapi"
+	"github.com/disaster37/go-kibana-rest/v8/kbapi"
 	"github.com/go-resty/resty/v2"
 )
 
@@ -34,7 +34,7 @@ func NewClient(cfg Config) (*Client, error) {
 	}
 
 	restyClient := resty.New().
-		SetHostURL(cfg.Address).
+		SetBaseURL(cfg.Address).
 		SetBasicAuth(cfg.Username, cfg.Password).
 		SetHeader("kbn-xsrf", "true").
 		SetHeader("Content-Type", "application/json")
@@ -48,7 +48,7 @@ func NewClient(cfg Config) (*Client, error) {
 		API:    kbapi.New(restyClient),
 	}
 
-	if cfg.DisableVerifySSL == true {
+	if cfg.DisableVerifySSL {
 		client.Client.SetTLSClientConfig(&tls.Config{InsecureSkipVerify: true})
 	}
 

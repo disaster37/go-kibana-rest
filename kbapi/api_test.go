@@ -33,7 +33,7 @@ func (s *KBAPITestSuite) SetupSuite() {
 	}
 
 	restyClient := resty.New().
-		SetHostURL(address).
+		SetBaseURL(address).
 		SetBasicAuth(username, password).
 		SetHeader("kbn-xsrf", "true").
 		SetHeader("Content-Type", "application/json")

@@ -2,7 +2,7 @@ package kbapi
 
 import (
 	"encoding/json"
-	"io/ioutil"
+	"os"
 
 	"github.com/stretchr/testify/assert"
 )
@@ -10,12 +10,14 @@ import (
 func (s *KBAPITestSuite) TestKibanaDashboard() {
 
 	// Import dashboard from fixtures
-	b, err := ioutil.ReadFile("../fixtures/kibana-dashboard.json")
+	b, err := os.ReadFile("../fixtures/kibana-dashboard.json")
 	if err != nil {
 		panic(err)
 	}
 	data := make(map[string]interface{})
-	err = json.Unmarshal(b, &data)
+	if err = json.Unmarshal(b, &data); err != nil {
+		panic(err)
+	}
 	err = s.API.KibanaDashboard.Import(data, nil, true, "default")
 	assert.NoError(s.T(), err)
 
@@ -25,12 +27,14 @@ func (s *KBAPITestSuite) TestKibanaDashboard() {
 	assert.NotNil(s.T(), data)
 
 	// Import dashboard from fixtures in specific space
-	b, err = ioutil.ReadFile("../fixtures/kibana-dashboard.json")
+	b, err = os.ReadFile("../fixtures/kibana-dashboard.json")
 	if err != nil {
 		panic(err)
 	}
 	data = make(map[string]interface{})
-	err = json.Unmarshal(b, &data)
+	if err = json.Unmarshal(b, &data); err != nil {
+		panic(err)
+	}
 	err = s.API.KibanaDashboard.Import(data, nil, true, "testacc")
 	assert.NoError(s.T(), err)
 

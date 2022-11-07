@@ -32,7 +32,7 @@ type KibanaSpaceCopySavedObjectParameter struct {
 	Spaces            []string                     `json:"spaces"`
 	IncludeReferences bool                         `json:"includeReferences"`
 	Overwrite         bool                         `json:"overwrite"`
-	CreateNewCopies   bool 						   `json:"createNewCopies"`
+	CreateNewCopies   bool                         `json:"createNewCopies"`
 	Objects           []KibanaSpaceObjectParameter `json:"objects"`
 }
 
@@ -198,7 +198,7 @@ func newKibanaSpaceCopySavedObjectsFunc(c *resty.Client) KibanaSpaceCopySavedObj
 
 		var errors []string
 		for name, object := range data {
-			if object.(map[string]interface{})["success"].(bool) == false {
+			if !object.(map[string]interface{})["success"].(bool) {
 				errors = append(errors, fmt.Sprintf("Error to process user space %s", name))
 			}
 		}
