@@ -8,17 +8,21 @@ import (
 )
 
 const (
-	basePathKibanaShortenURL = "/api/shorten_url" // Base URL to access on Kibana shorten URL
+	basePathKibanaShortenURL = "/api/short_url" // Base URL to access on Kibana shorten URL
 )
 
 // ShortenURL is the shorten URL object
 type ShortenURL struct {
-	URL string `json:"url"`
+	LocatorId         string         `json:"locatorId"`
+	Params            map[string]any `json:"params"`
+	Slug              string         `json:"slug,omitempty"`
+	HumanReadableSlug bool           `json:"humanReadableSlug,omitempty"`
 }
 
 // ShortenURLResponse is the shorten URL object response
 type ShortenURLResponse struct {
-	ID string `json:"urlId"`
+	ID      string      `json:"id"`
+	Locator *ShortenURL `json:"locator"`
 }
 
 // KibanaShortenURLCreate permit to create new shorten URL

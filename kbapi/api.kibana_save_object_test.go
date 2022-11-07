@@ -28,10 +28,10 @@ func (s *KBAPITestSuite) TestKibanaSaveObject() {
 	if err != nil {
 		panic(err)
 	}
-	resp, err = s.API.KibanaSavedObject.Create(data, "index-pattern", "test", true, "testacc")
+	resp, err = s.API.KibanaSavedObject.Create(data, "index-pattern", "test2", true, "testacc")
 	assert.NoError(s.T(), err)
 	assert.NotNil(s.T(), resp)
-	assert.Equal(s.T(), "test", resp["id"])
+	assert.Equal(s.T(), "test2", resp["id"])
 	assert.Equal(s.T(), "test-pattern-*", resp["attributes"].(map[string]interface{})["title"])
 
 	// Get index pattern
@@ -41,10 +41,10 @@ func (s *KBAPITestSuite) TestKibanaSaveObject() {
 	assert.Equal(s.T(), "test", resp["id"])
 
 	// Get index pattern from space
-	resp, err = s.API.KibanaSavedObject.Get("index-pattern", "test", "testacc")
+	resp, err = s.API.KibanaSavedObject.Get("index-pattern", "test2", "testacc")
 	assert.NoError(s.T(), err)
 	assert.NotNil(s.T(), resp)
-	assert.Equal(s.T(), "test", resp["id"])
+	assert.Equal(s.T(), "test2", resp["id"])
 
 	// Search index pattern
 	parameters := &OptionalFindParameters{
@@ -56,7 +56,7 @@ func (s *KBAPITestSuite) TestKibanaSaveObject() {
 	assert.NoError(s.T(), err)
 	assert.NotNil(s.T(), resp)
 	dataRes := resp["saved_objects"].([]interface{})[0].(map[string]interface{})
-	assert.Equal(s.T(), "test", dataRes["id"].(string))
+	assert.NotEmpty(s.T(), dataRes["id"].(string))
 
 	// Search index pattern from space
 	parameters = &OptionalFindParameters{
@@ -68,7 +68,7 @@ func (s *KBAPITestSuite) TestKibanaSaveObject() {
 	assert.NoError(s.T(), err)
 	assert.NotNil(s.T(), resp)
 	dataRes = resp["saved_objects"].([]interface{})[0].(map[string]interface{})
-	assert.Equal(s.T(), "test", dataRes["id"].(string))
+	assert.NotEmpty(s.T(), dataRes["id"].(string))
 
 	// Update index pattern
 	dataJSON = `{"attributes": {"title": "test-pattern2-*"}}`
@@ -88,10 +88,10 @@ func (s *KBAPITestSuite) TestKibanaSaveObject() {
 	if err != nil {
 		panic(err)
 	}
-	resp, err = s.API.KibanaSavedObject.Update(data, "index-pattern", "test", "testacc")
+	resp, err = s.API.KibanaSavedObject.Update(data, "index-pattern", "test2", "testacc")
 	assert.NoError(s.T(), err)
 	assert.NotNil(s.T(), resp)
-	assert.Equal(s.T(), "test", resp["id"])
+	assert.Equal(s.T(), "test2", resp["id"])
 	assert.Equal(s.T(), "test-pattern2-*", resp["attributes"].(map[string]interface{})["title"])
 
 	// Export index pattern
@@ -109,7 +109,7 @@ func (s *KBAPITestSuite) TestKibanaSaveObject() {
 	request = []map[string]string{
 		{
 			"type": "index-pattern",
-			"id":   "test",
+			"id":   "test2",
 		},
 	}
 	dataExported, err = s.API.KibanaSavedObject.Export(nil, request, true, "testacc")
@@ -144,9 +144,9 @@ func (s *KBAPITestSuite) TestKibanaSaveObject() {
 	assert.Nil(s.T(), resp)
 
 	// Delete index pattern in space
-	err = s.API.KibanaSavedObject.Delete("index-pattern", "test", "testacc")
+	err = s.API.KibanaSavedObject.Delete("index-pattern", "test2", "testacc")
 	assert.NoError(s.T(), err)
-	resp, err = s.API.KibanaSavedObject.Get("index-pattern", "test", "testacc")
+	resp, err = s.API.KibanaSavedObject.Get("index-pattern", "test2", "testacc")
 	assert.NoError(s.T(), err)
 	assert.Nil(s.T(), resp)
 }
