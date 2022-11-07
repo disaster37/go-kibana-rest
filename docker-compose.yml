@@ -13,7 +13,7 @@ services:
     image: docker.elastic.co/kibana/kibana:8.5.0
     environment:
       ELASTICSEARCH_HOSTS: http://es:9200
-      ELASTICSEARCH_USERNAME: elastic
+      ELASTICSEARCH_USERNAME: kibana_system
       ELASTICSEARCH_PASSWORD: changeme
     links:
       - elasticsearch:es
