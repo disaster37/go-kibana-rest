@@ -12,6 +12,7 @@ type Config struct {
 	Address          string
 	Username         string
 	Password         string
+	ApiKey           string
 	DisableVerifySSL bool
 	CAs              []string
 }
@@ -35,9 +36,14 @@ func NewClient(cfg Config) (*Client, error) {
 
 	restyClient := resty.New().
 		SetBaseURL(cfg.Address).
-		SetBasicAuth(cfg.Username, cfg.Password).
 		SetHeader("kbn-xsrf", "true").
 		SetHeader("Content-Type", "application/json")
+
+	if cfg.ApiKey != "" {
+		restyClient.SetAuthScheme("ApiKey").SetAuthToken(cfg.ApiKey)
+	} else {
+		restyClient.SetBasicAuth(cfg.Username, cfg.Password)
+	}
 
 	for _, path := range cfg.CAs {
 		restyClient.SetRootCertificate(path)
