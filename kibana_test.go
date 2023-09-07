@@ -44,10 +44,9 @@ func (s *KBTestSuite) TestNewClient() {
 
 	assert.NoError(s.T(), err)
 	assert.NotNil(s.T(), client)
-	assert.NotNil(s.T(), client.Client.AuthScheme, "Basic")
-	assert.Equal(s.T(), client.Client.UserInfo.Username, "elastic")
-	assert.Equal(s.T(), client.Client.UserInfo.Password, "changeme")
-
+	assert.NotNil(s.T(), "Basic", client.Client.AuthScheme)
+	assert.Equal(s.T(), "elastic", client.Client.UserInfo.Username)
+	assert.Equal(s.T(), "changeme", client.Client.UserInfo.Password)
 }
 
 func (s *KBTestSuite) TestNewAPIKeyClient() {
@@ -63,8 +62,8 @@ func (s *KBTestSuite) TestNewAPIKeyClient() {
 	assert.NoError(s.T(), err)
 	assert.NotNil(s.T(), client)
 
-	assert.Equal(s.T(), client.Client.AuthScheme, "ApiKey")
-	assert.Equal(s.T(), client.Client.Token, "foo")
+	assert.Equal(s.T(), "ApiKey", client.Client.AuthScheme)
+	assert.Equal(s.T(), "foo", client.Client.Token, "foo")
 
 }
 
@@ -75,4 +74,8 @@ func (s *KBTestSuite) TestNewDefaultClient() {
 	assert.NoError(s.T(), err)
 	assert.NotNil(s.T(), client)
 
+	assert.NotNil(s.T(), client.Client.AuthScheme, "Basic")
+	assert.Equal(s.T(), client.Client.UserInfo.Username, "")
+	assert.Equal(s.T(), client.Client.UserInfo.Password, "")
+	assert.Equal(s.T(), client.Client.Token, "")
 }
