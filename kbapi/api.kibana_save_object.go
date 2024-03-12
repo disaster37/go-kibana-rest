@@ -336,7 +336,7 @@ func newKibanaSavedObjectExportFunc(c *resty.Client) KibanaSavedObjectExport {
 			payload["objects"] = objects
 		}
 		payload["includeReferencesDeep"] = deepReference
-		log.Debug("Payload: ", payload)
+		
 
 		var path string
 		if kibanaSpace == "" || kibanaSpace == "default" {
@@ -350,6 +350,7 @@ func newKibanaSavedObjectExportFunc(c *resty.Client) KibanaSavedObjectExport {
 		if err != nil {
 			return nil, err
 		}
+		log.Debug("Payload: ", string(jsonData))
 		resp, err := c.R().SetBody(jsonData).Post(path)
 		if err != nil {
 			return nil, err
